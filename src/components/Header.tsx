@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { ShoppingBag, Truck, ShieldCheck, Search, Menu, X, Settings2, Home, Compass, Clipboard, ArrowRight, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -19,6 +19,13 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
   const { currentView, setView, cart, setSelectedProductId, updateCartQuantity, removeFromCart } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const cartTotalItems = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -58,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
       </div>
 
       {/* Main Navigation Row */}
-      <div className="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs py-4" id="main-nav-bar">
+      <div className={`bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs transition-all duration-300 ${isScrolled ? 'py-2 shadow-md' : 'py-4'}`} id="main-nav-bar">
         <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between gap-4">
           
           {/* Logo Brand */}

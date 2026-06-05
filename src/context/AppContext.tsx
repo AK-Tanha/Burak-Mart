@@ -21,6 +21,10 @@ interface AppContextType {
   selectedProductId: string | null;
   activeOrderTrackingId: string | null;
   adminPasswordVerified: boolean;
+  favorites: string[];
+  isLoaded: boolean;
+  toasts: { id: string; message: string; type: 'success' | 'error' }[];
+  isOnline: boolean;
   
   // Navigation
   setView: (view: AppView) => void;
@@ -28,6 +32,9 @@ interface AppContextType {
   setSelectedProductId: (id: string | null) => void;
   setActiveOrderTrackingId: (id: string | null) => void;
   setAdminPasswordVerified: (verified: boolean) => void;
+  toggleFavorite: (productId: string) => void;
+  addToast: (message: string, type: 'success' | 'error') => void;
+  removeToast: (id: string) => void;
 
   // Shopping Actions
   addToCart: (product: Product, quantity: number, size?: string, color?: string) => void;
@@ -162,6 +169,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [coupons, setCoupons] = useState<Coupon[]>(INITIAL_COUPONS);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [currentView, setView] = useState<AppView>('home');
@@ -171,8 +179,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [adminPasswordVerified, setAdminPasswordVerified] = useState<boolean>(false);
   const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
 
+  const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' }[]>([]);
+  const [isOnline, setIsOnline] = useState(true);
+
   // Load state on mount (Client-only)
   useEffect(() => {
+    setIsOnline(navigator.onLine);
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
     if (typeof window !== 'undefined') {
       try {
         const storedProducts = localStorage.getItem('burak_mart_products');
@@ -192,6 +209,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setOrders(sampleOrders);
           localStorage.setItem('burak_mart_orders', JSON.stringify(sampleOrders));
         }
+
+        const storedFavorites = localStorage.getItem('burak_mart_favorites');
+        if (storedFavorites) setFavorites(JSON.parse(storedFavorites));
       } catch (e) {
         console.error("Error loading localStorage context:", e);
       } finally {
@@ -225,7 +245,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [orders, isLoaded]);
 
-  // Cart operations
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('burak_mart_favorites', JSON.stringify(favorites));
+    }
+  }, [favorites, isLoaded]);
+
+  const addToast = (message: string, type: 'success' | 'error') => {
+    const id = Date.now().toString();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => removeToast(id), 3000);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const toggleFavorite = (productId: string) => {
+    setFavorites(prev => {
+      const next = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
+      return next;
+    });
+  };
+
   const addToCart = (product: Product, quantity: number, size?: string, color?: string) => {
     setCart((prev) => {
       const existingIdx = prev.findIndex(
@@ -466,11 +508,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectedProductId,
         activeOrderTrackingId,
         adminPasswordVerified,
+        favorites,
+        isLoaded,
+        toasts,
+        isOnline,
         setView,
         setPortal,
         setSelectedProductId,
         setActiveOrderTrackingId,
         setAdminPasswordVerified,
+        toggleFavorite,
+        addToast,
+        removeToast,
         addToCart,
         removeFromCart,
         updateCartQuantity,

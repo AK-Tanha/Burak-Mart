@@ -5,10 +5,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import { Product } from '../types';
 import { useApp } from '../context/AppContext';
-import { Star, ShoppingCart, Info, CheckCircle2 } from 'lucide-react';
+import { Star, ShoppingCart, Info, CheckCircle2, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface ProductCardProps {
@@ -16,7 +17,9 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { setView, setSelectedProductId, addToCart } = useApp();
+  const [quickAddStatus, setQuickAddStatus] = useState<'idle' | 'adding' | 'added'>('idle');
+  const { setView, setSelectedProductId, addToCart, favorites, toggleFavorite } = useApp();
+  const isFavorite = favorites.includes(product.id);
 
   const discountPercent = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -31,21 +34,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     e.stopPropagation();
     if (product.stock <= 0) return;
     
-    // Choose first default size and color if available
+    // Trigger quick add state
+    setQuickAddStatus('adding');
+
     const defaultSize = product.sizes && product.sizes.length > 0 ? product.sizes[0] : undefined;
     const defaultColor = product.colors && product.colors.length > 0 ? product.colors[0] : undefined;
     
     addToCart(product, 1, defaultSize, defaultColor);
     
-    // Trigger quick toast simulation
-    const btn = e.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<svg class="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
-    btn.classList.add('bg-orange-700');
     setTimeout(() => {
-      btn.innerHTML = originalText;
-      btn.classList.remove('bg-orange-700');
-    }, 1000);
+      setQuickAddStatus('added');
+      setTimeout(() => setQuickAddStatus('idle'), 2000);
+    }, 600);
   };
 
   return (
@@ -61,9 +61,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     >
       {/* Product Image Stage */}
       <div className="relative aspect-square overflow-hidden bg-neutral-50 flex items-center justify-center">
-        <img
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleFavorite(product.id); }}
+          className={`absolute top-3 right-3 z-20 p-2 rounded-full transition-colors ${
+            isFavorite ? 'bg-red-50 text-red-500' : 'bg-white/80 text-neutral-400 hover:text-red-500'
+          }`}
+        >
+          <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+        </button>
+        <Image
           src={product.image}
           alt={product.name}
+          fill
           referrerPolicy="no-referrer"
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
           id={`product-image-${product.id}`}
@@ -150,17 +159,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <Info className="w-4 h-4" />
             </button>
             <button
-              disabled={product.stock <= 0}
+              disabled={product.stock <= 0 || quickAddStatus !== 'idle'}
               onClick={handleQuickAdd}
-              className={`flex items-center justify-center gap-1 px-3 py-2 rounded-lg font-sans text-xs font-bold transition-colors cursor-pointer ${
+              className={`flex items-center justify-center gap-1 px-3 py-2 rounded-lg font-sans text-xs font-bold transition-all cursor-pointer ${
                 product.stock <= 0
                   ? 'bg-neutral-100 border border-neutral-250 text-neutral-400 cursor-not-allowed'
+                  : quickAddStatus === 'added'
+                  ? 'bg-green-600 border border-green-600 text-white'
                   : 'bg-orange-600 border border-orange-600 text-white hover:bg-orange-700 active:scale-95'
               }`}
               id={`quick-add-${product.id}`}
             >
-              <ShoppingCart className="w-3.5 h-3.5" />
-              <span>Quick Add</span>
+              {quickAddStatus === 'adding' ? (
+                <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}><ShoppingCart className="w-3.5 h-3.5" /></motion.div>
+              ) : quickAddStatus === 'added' ? (
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}><CheckCircle2 className="w-3.5 h-3.5" /></motion.div>
+              ) : <ShoppingCart className="w-3.5 h-3.5" />}
+              <span>{quickAddStatus === 'idle' ? 'Quick Add' : quickAddStatus === 'adding' ? 'Adding...' : 'Added'}</span>
             </button>
           </div>
         </div>
