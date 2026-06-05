@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { ShoppingBag, Truck, ShieldCheck, Search, Menu, X, Settings2, Home, Compass, Clipboard, ArrowRight, Trash2 } from 'lucide-react';
+import { ShoppingBag, Truck, ShieldCheck, Search, Menu, X, Settings2, Home, Compass, Clipboard, ArrowRight, Trash2, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface HeaderProps {
@@ -22,7 +22,9 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+        setIsScrolled(window.scrollY > 20);
+    };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -65,247 +67,72 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
       </div>
 
       {/* Main Navigation Row */}
-      <div className={`bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs transition-all duration-300 ${isScrolled ? 'py-2 shadow-md' : 'py-4'}`} id="main-nav-bar">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between gap-4">
+      <header className={`fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all duration-300 ${isScrolled ? 'h-[60px] shadow-md' : 'h-[80px] shadow-sm'}`} id="main-nav-bar">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-full flex items-center justify-between gap-4">
           
-          {/* Logo Brand */}
-          <button 
-            onClick={handleLogoClick}
-            className="flex items-center gap-2.5 cursor-pointer group focus:outline-hidden"
-            id="logo-button"
-          >
-            <div className="w-10 h-10 flex items-center justify-center shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-10 h-10 group-hover:scale-105 transition-transform duration-300" id="burak-mart-logo-svg">
-                {/* Double line Octagon */}
-                <polygon 
-                  points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" 
-                  fill="none" 
-                  stroke="#171717" 
-                  strokeWidth="2" 
-                />
-                <polygon 
-                  points="32,8 68,8 92,32 92,68 68,92 32,92 8,68 8,32" 
-                  fill="#ffffff" 
-                  stroke="#171717" 
-                  strokeWidth="0.75" 
-                />
-                
-                {/* Orange slanted tag */}
-                <g transform="rotate(-30 50 48)">
-                  <rect 
-                    x="37" 
-                    y="31" 
-                    width="26" 
-                    height="38" 
-                    rx="3.5" 
-                    fill="#FF7A00" 
-                  />
-                  {/* Tag hole */}
-                  <circle 
-                    cx="50" 
-                    cy="37" 
-                    r="3" 
-                    fill="#FFFFFF" 
-                  />
-                </g>
-                
-                {/* Black Shopping Cart, superimposed */}
-                <g stroke="#171717" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" transform="translate(6, 4)">
-                  {/* Handle to base */}
-                  <path d="M 31,39 L 37,39 L 42,51 L 56,51 L 60,42 L 39,42" />
-                  {/* Mesh/Basket lines */}
-                  <path d="M 45,42 L 45,51" strokeWidth="1.2" />
-                  <path d="M 49,42 L 49,51" strokeWidth="1.2" />
-                  <path d="M 53,42 L 53,51" strokeWidth="1.2" />
-                  <path d="M 41,46 L 58,46" strokeWidth="1.2" />
-                  {/* Wheels */}
-                  <circle cx="43" cy="55" r="1.5" fill="#171717" stroke="none" />
-                  <circle cx="55" cy="55" r="1.5" fill="#171717" stroke="none" />
-                </g>
-              </svg>
-            </div>
-            <div className="text-left">
-              <span className="block font-sans font-extrabold text-neutral-900 tracking-tight text-xl leading-none">
-                BURAK MART
-              </span>
-              <span className="block text-[10px] font-sans text-orange-600 font-bold uppercase tracking-wide mt-0.5" style={{ fontFamily: 'Georgia, serif' }}>
-                Try the new best
-              </span>
-            </div>
-          </button>
-
-          {/* Catalog Search Bar (Always visible on Md+ screen) */}
-          <div className="hidden md:flex flex-1 max-w-md relative" id="desktop-search-container">
+          {/* Left: Mobile Hamburger / Desktop Logo */}
+          <div className="flex items-center gap-3">
+            <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden flex items-center justify-center p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
+                aria-label="Toggle menu"
+                id="mobile-menu-trigger"
+            >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <button 
+                onClick={handleLogoClick}
+                className="flex items-center gap-2 cursor-pointer group focus:outline-hidden"
+                id="logo-button"
+            >
+                <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-8 h-8 group-hover:scale-105 transition-transform duration-300">
+                        {/* Simplified Logo for brevity inside Header */}
+                        <polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="none" stroke="#171717" strokeWidth="4" />
+                    </svg>
+                </div>
+                <span className="hidden md:block font-sans font-extrabold text-neutral-900 tracking-tight text-lg">BURAK MART</span>
+            </button>
+          </div>
+          
+          {/* Center: Search (Desktop) */}
+          <div className="hidden md:flex flex-1 max-w-sm relative" id="desktop-search-container">
             <input
               type="text"
-              placeholder="Search fashion, accessories..."
+              placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                if (currentView !== 'catalog') {
-                  setView('catalog');
-                }
+                if (currentView !== 'catalog') setView('catalog');
               }}
-              className="w-full bg-slate-50 border border-slate-200 rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition-all text-slate-800"
+              className="w-full bg-slate-100/50 border border-slate-200 rounded-full py-2 pl-10 pr-4 text-xs outline-none focus:ring-1 focus:ring-orange-500 focus:bg-white transition-all"
             />
-            <Search className="absolute left-3.5 top-2.5 w-4.5 h-4.5 text-slate-400 pointer-events-none" />
-            {searchQuery && (
-              <button 
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-2 text-xs font-mono text-slate-400 hover:text-slate-700 pointer-events-auto bg-slate-100 px-1.5 py-0.5 rounded-sm"
-              >
-                Clear
-              </button>
-            )}
+            <Search className="absolute left-3.5 top-2 w-4 h-4 text-slate-400" />
           </div>
 
-          {/* Desktop Control Menus */}
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-sans font-medium text-slate-500" id="desktop-nav-menu">
-            <button 
-              onClick={() => handleNavigate('home')}
-              className={`flex items-center gap-1.5 transition-colors cursor-pointer hover:text-orange-600 ${currentView === 'home' ? 'text-orange-600 font-semibold' : 'text-slate-500'}`}
-              id="nav-home"
-            >
-              <Home className="w-4 h-4" /> Home
+          {/* Right: Icons */}
+          <div className="flex items-center gap-2" id="header-action-buttons">
+            <button className="p-2 text-slate-600 hover:text-orange-600 transition-colors hidden md:block">
+                <Heart className="w-5 h-5" />
             </button>
-            
-            <button 
-              onClick={() => handleNavigate('catalog')}
-              className={`flex items-center gap-1.5 transition-colors cursor-pointer hover:text-orange-600 ${currentView === 'catalog' ? 'text-orange-600 font-semibold' : 'text-slate-500'}`}
-              id="nav-catalog"
-            >
-              <Compass className="w-4 h-4" /> Discover
-            </button>
- 
-            <button 
-              onClick={() => handleNavigate('order-tracking')}
-              className={`flex items-center gap-1.5 transition-colors cursor-pointer hover:text-orange-600 ${currentView === 'order-tracking' ? 'text-orange-600 font-semibold' : 'text-slate-500'}`}
-              id="nav-tracking"
-            >
-              <Clipboard className="w-4 h-4" /> Track Order
-            </button>
-          </nav>
-
-          {/* Header Action Button Row */}
-          <div className="flex items-center gap-3" id="header-action-buttons">
-            {/* Quick Toggle for Admin */}
-            <button
-              onClick={() => handleNavigate('admin')}
-              className={`flex items-center justify-center p-2.5 rounded-xl border transition-all hover:scale-102 cursor-pointer ${
-                currentView === 'admin'
-                  ? 'bg-orange-50 border-orange-200 text-orange-755 text-orange-700'
-                  : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
-              }`}
-              title="Admin Dashboard"
-              id="admin-panel-toggle"
-            >
-              <Settings2 className="w-4.5 h-4.5" />
-              <span className="hidden sm:inline ml-1.5 text-xs font-semibold font-mono tracking-tight">Admin</span>
-            </button>
- 
-            {/* Shopping Cart Trigger */}
             <div className="relative">
-              <button
-                onClick={() => setCartDropdownOpen(!cartDropdownOpen)}
-                className={`relative flex items-center justify-center p-2.5 rounded-xl border transition-all hover:scale-102 cursor-pointer ${
-                  cartDropdownOpen || currentView === 'cart'
-                    ? 'bg-orange-600 border-orange-600 text-white'
-                    : 'bg-orange-50 border-orange-100 text-orange-800 hover:bg-orange-100/80'
-                }`}
-                id="cart-trigger-button"
-              >
-                <ShoppingBag className="w-4.5 h-4.5" />
-                <span className="ml-1.5 hidden sm:inline text-xs font-bold">Cart</span>
-                
-                {cartTotalItems > 0 && (
-                  <span 
-                    className={`absolute -top-1.5 -right-1.5 min-w-5 h-5 flex items-center justify-center text-[10px] font-sans font-bold rounded-full border shadow-sm px-1 ${
-                      cartDropdownOpen || currentView === 'cart'
-                        ? 'bg-slate-950 border-slate-900 text-white' 
-                        : 'bg-orange-600 border-white text-white'
-                    }`}
-                    id="cart-badge-count"
-                  >
-                    {cartTotalItems}
-                  </span>
-                )}
-              </button>
-
-              {cartDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-slate-200 shadow-xl rounded-2xl z-50 p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-bold text-sm">Your Cart ({cartTotalItems})</h3>
-                    <button onClick={() => setCartDropdownOpen(false)} className="text-slate-400 hover:text-slate-600">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  {cart.length === 0 ? (
-                    <p className="text-sm text-slate-500 py-4 text-center">Your cart is empty.</p>
-                  ) : (
-                    <>
-                      <div className="space-y-3 max-h-60 overflow-y-auto mb-4">
-                        {cart.map((item) => (
-                          <div key={`${item.product.id}-${item.selectedSize}-${item.selectedColor}`} className="flex items-center gap-3 border-b border-slate-100 pb-3 last:border-0 last:pb-0">
-                            <img src={item.product.image} alt={item.product.name} className="w-12 h-12 object-cover rounded-lg" />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-slate-800">{item.product.name}</p>
-                              <p className="text-xs text-slate-500">{item.selectedSize} / {item.selectedColor}</p>
-                              <p className="text-xs text-slate-600 mt-1 font-mono">
-                                ${item.product.price.toFixed(2)} × {item.quantity} = ${(item.product.price * item.quantity).toFixed(2)}
-                              </p>
-                            </div>
-                            <div className="flex flex-col items-end gap-1">
-                              <div className="flex items-center gap-1">
-                                <button 
-                                  onClick={() => updateCartQuantity(item.product.id, item.quantity - 1, item.selectedSize, item.selectedColor)}
-                                  className="w-6 h-6 flex items-center justify-center border rounded-md hover:bg-slate-100"
-                                >-</button>
-                                <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
-                                <button 
-                                  onClick={() => updateCartQuantity(item.product.id, item.quantity + 1, item.selectedSize, item.selectedColor)}
-                                  className="w-6 h-6 flex items-center justify-center border rounded-md hover:bg-slate-100"
-                                >+</button>
-                              </div>
-                              <button
-                                onClick={() => removeFromCart(item.product.id, item.selectedSize, item.selectedColor)}
-                                className="text-[10px] text-red-500 hover:text-red-700 flex items-center gap-1"
-                                title="Remove item"
-                              >
-                                <Trash2 className="w-3 h-3" /> Remove
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <button 
-                        onClick={() => {
-                          setCartDropdownOpen(false);
-                          handleNavigate('cart');
-                        }}
-                        className="w-full bg-neutral-900 text-white py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-neutral-800"
-                      >
-                        View Shopping Bag <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
+                <button
+                    onClick={() => setCartDropdownOpen(!cartDropdownOpen)}
+                    className="p-2 text-slate-600 hover:text-orange-600 transition-colors relative"
+                    id="cart-trigger-button"
+                >
+                    <ShoppingBag className="w-5 h-5" />
+                    {cartTotalItems > 0 && (
+                        <span className="absolute -top-1 -right-1 text-[9px] font-bold bg-orange-600 text-white w-4 h-4 flex items-center justify-center rounded-full">
+                            {cartTotalItems}
+                        </span>
+                    )}
+                </button>
             </div>
- 
-            {/* Mobile Hamburger menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden flex items-center justify-center p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 transition-colors"
-              aria-label="Toggle menu"
-              id="mobile-menu-trigger"
-            >
-              {mobileMenuOpen ? <X className="w-4.5 h-4.5" /> : <Menu className="w-4.5 h-4.5" />}
-            </button>
           </div>
-
         </div>
-      </div>
+      </header>
+
 
       {/* Mobile search bar (Visible below md) */}
       <div className="md:hidden bg-slate-100 px-4 py-2 border-b border-slate-200 flex" id="mobile-search-bar">

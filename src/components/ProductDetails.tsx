@@ -8,7 +8,9 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { ArrowLeft, Star, ShoppingBag, Send, ShieldAlert, BadgeCheck, Truck, RotateCcw, MessageSquarePlus } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from './Button';
+import { LazyImage } from './LazyImage';
 
 export const ProductDetails: React.FC = () => {
   const { 
@@ -46,6 +48,8 @@ export const ProductDetails: React.FC = () => {
     product.colors && product.colors.length > 0 ? product.colors[0] : ''
   );
   const [quantity, setQuantity] = useState<number>(1);
+  const [isAdding, setIsAdding] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   // New review form state
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -60,21 +64,14 @@ export const ProductDetails: React.FC = () => {
 
   const handleAddToCart = () => {
     if (product.stock <= 0) return;
-    addToCart(product, quantity, selectedSize || undefined, selectedColor || undefined);
+    setIsAdding(true);
     
-    // Quick indicator transition simulation
-    const btn = document.getElementById('details-add-to-cart-btn');
-    if (btn) {
-      const orig = btn.innerText;
-      btn.innerText = 'Added to Shopping Bag! 🛍️';
-      btn.classList.remove('bg-orange-600');
-      btn.classList.add('bg-orange-700');
-      setTimeout(() => {
-        btn.innerText = orig;
-        btn.classList.remove('bg-orange-700');
-        btn.classList.add('bg-orange-600');
-      }, 1500);
-    }
+    setTimeout(() => {
+      addToCart(product, quantity, selectedSize || undefined, selectedColor || undefined);
+      setIsAdding(false);
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 2000);
+    }, 600);
   };
 
   const handleDirectBuy = () => {
@@ -106,18 +103,18 @@ export const ProductDetails: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 font-sans" id="product-detail-view">
       
-      {/* Back to Results Anchor */}
-      <button
+      <Button
+        variant="tertiary"
+        size="md"
         onClick={() => {
           setSelectedProductId(null);
           setView('catalog');
         }}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 hover:text-orange-600 transition-colors py-2 mb-6 group cursor-pointer focus:outline-hidden"
-        id="back-to-catalog-btn"
+        className="mb-6 bg-transparent hover:bg-neutral-50 !p-0 !h-auto text-neutral-500 hover:text-orange-600 border-none group"
+        icon={<ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />}
       >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-        <span>Back to catalog products</span>
-      </button>
+        Back to catalog products
+      </Button>
 
       {/* Main Grid Card */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 bg-white rounded-3xl p-4 md:p-8 border border-neutral-100 shadow-xs mb-12">
@@ -125,20 +122,22 @@ export const ProductDetails: React.FC = () => {
         {/* Left Side: Large image wrapper */}
         <div className="col-span-1 lg:col-span-6 flex flex-col gap-4">
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-neutral-50 border border-neutral-100 flex items-center justify-center">
-            <img
+            <LazyImage
               src={product.image}
               alt={product.name}
+              fill
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover object-center"
+              className="object-cover object-center"
+              wrapperClassName="w-full h-full"
               id="details-large-image"
             />
             {discountPercent > 0 && (
-              <span className="absolute top-4 left-4 bg-red-500 text-white font-mono font-bold text-xs tracking-wide px-3 py-1 rounded-lg">
+              <span className="absolute top-4 left-4 z-20 bg-red-500 text-white font-mono font-bold text-xs tracking-wide px-3 py-1 rounded-lg">
                 SAVE {discountPercent}%
               </span>
             )}
             {product.isNew && (
-              <span className="absolute top-4 right-4 bg-orange-600 text-white font-mono font-bold text-[10px] tracking-widest px-3 py-1 rounded-lg">
+              <span className="absolute top-4 right-4 z-20 bg-orange-600 text-white font-mono font-bold text-[10px] tracking-widest px-3 py-1 rounded-lg">
                 NEW RELEASE
               </span>
             )}
@@ -350,22 +349,29 @@ export const ProductDetails: React.FC = () => {
 
           {/* Checkout & Purchase Block */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-auto pt-6 border-t border-neutral-100">
-            <button
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
               disabled={product.stock <= 0}
+              isLoading={isAdding}
+              isSuccess={isAdded}
               onClick={handleAddToCart}
-              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-orange-600 border border-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-bold shadow-xs active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              icon={<ShoppingBag className="w-5 h-5" />}
               id="details-add-to-cart-btn"
             >
-              <ShoppingBag className="w-4.5 h-4.5" />
-              <span>Add to Shopping Bag</span>
-            </button>
-            <button
+                Add to Shopping Bag
+            </Button>
+            <Button
+              variant="tertiary"
+              size="lg"
+              fullWidth
               disabled={product.stock <= 0}
+              className="bg-neutral-900 text-white hover:bg-neutral-800"
               onClick={handleDirectBuy}
-              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-neutral-900 border border-neutral-900 hover:bg-neutral-850 text-white rounded-xl text-sm font-bold shadow-xs active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer font-sans"
             >
-              <span>View Bag & Checkout</span>
-            </button>
+                View Bag & Checkout
+            </Button>
           </div>
 
         </div>
@@ -386,13 +392,15 @@ export const ProductDetails: React.FC = () => {
             </p>
           </div>
 
-          <button
+          <Button
+            variant="tertiary"
+            size="md"
+            className="text-orange-700 bg-orange-50 border border-orange-100"
             onClick={() => setShowReviewForm(!showReviewForm)}
-            className="inline-flex items-center gap-2 text-xs font-bold text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-100 rounded-lg px-4 py-2 transition-colors cursor-pointer"
+            icon={<MessageSquarePlus className="w-4 h-4" />}
           >
-            <MessageSquarePlus className="w-4 h-4" />
-            <span>{showReviewForm ? 'Cancel Review' : 'Write a Review'}</span>
-          </button>
+            {showReviewForm ? 'Cancel Review' : 'Write a Review'}
+          </Button>
         </div>
 
         {/* Create Review Expandable Form */}
@@ -471,12 +479,15 @@ export const ProductDetails: React.FC = () => {
                   ></textarea>
                 </div>
 
-                <button
+                <Button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-900 border border-neutral-900 text-white rounded-lg hover:bg-neutral-800 text-xs font-bold"
+                  variant="tertiary"
+                  size="md"
+                  className="bg-neutral-900 text-white"
+                  icon={<Send className="w-4 h-4" />}
                 >
-                  <Send className="w-3.5 h-3.5" /> Submit Verified Review
-                </button>
+                  Submit Verified Review
+                </Button>
 
               </form>
             </motion.div>

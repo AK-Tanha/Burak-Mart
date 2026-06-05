@@ -1,6 +1,6 @@
 'use client'
 import { useApp } from '../context/AppContext';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle } from 'lucide-react';
 
 export const ToastManager = () => {

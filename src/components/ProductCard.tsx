@@ -6,11 +6,12 @@
  */
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { Product } from '../types';
 import { useApp } from '../context/AppContext';
 import { Star, ShoppingCart, Info, CheckCircle2, Heart } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
+import { Button } from './Button';
+import { LazyImage } from './LazyImage';
 
 interface ProductCardProps {
   product: Product;
@@ -18,7 +19,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [quickAddStatus, setQuickAddStatus] = useState<'idle' | 'adding' | 'added'>('idle');
-  const { setView, setSelectedProductId, addToCart, favorites, toggleFavorite } = useApp();
+  const { setView, setSelectedProductId, addToCart, favorites, toggleFavorite, addToast } = useApp();
   const isFavorite = favorites.includes(product.id);
 
   const discountPercent = product.originalPrice
@@ -41,6 +42,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const defaultColor = product.colors && product.colors.length > 0 ? product.colors[0] : undefined;
     
     addToCart(product, 1, defaultSize, defaultColor);
+    addToast(`${product.name} added to cart`, 'success');
     
     setTimeout(() => {
       setQuickAddStatus('added');
@@ -53,9 +55,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      whileHover={{ y: -6 }}
+      whileHover={{ y: -6, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
       transition={{ duration: 0.3 }}
-      className="group bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col h-full cursor-pointer"
+      className="group bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-xs transition-all flex flex-col h-full cursor-pointer"
       onClick={handleCardClick}
       id={`product-card-${product.id}`}
     >
@@ -69,26 +71,39 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         >
           <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
         </button>
-        <Image
+
+        <LazyImage
           src={product.image}
           alt={product.name}
           fill
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          wrapperClassName="w-full h-full"
           id={`product-image-${product.id}`}
         />
 
         {/* Hot Badges */}
         <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 items-start">
           {product.isNew && (
-            <span className="bg-orange-655 bg-orange-600 text-white font-mono font-bold text-[9px] tracking-widest uppercase px-2 py-0.5 rounded-md shadow-xs">
+            <motion.span
+              key="new-badge"
+              initial={{ rotate: 0, scale: 0 }}
+              animate={{ rotate: 360, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              className="bg-yellow-400 text-neutral-900 font-mono font-bold text-[9px] tracking-widest uppercase px-2 py-0.5 rounded-md shadow-xs origin-center"
+            >
               NEW
-            </span>
+            </motion.span>
           )}
           {discountPercent > 0 && (
-            <span className="bg-red-500 text-white font-mono font-bold text-[10px] tracking-wide px-2 py-0.5 rounded-md shadow-xs">
+            <motion.span
+              key="discount-badge"
+              animate={{ scale: [1, 1.15, 1] }}
+              transition={{ repeat: Infinity, duration: 0.8 }}
+              className="bg-red-500 text-white font-mono font-bold text-[10px] tracking-wide px-2 py-0.5 rounded-md shadow-xs"
+            >
               SAVE {discountPercent}%
-            </span>
+            </motion.span>
           )}
         </div>
 
@@ -118,10 +133,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <span className="font-mono text-[10px] text-neutral-400 font-semibold uppercase tracking-wider">
             {product.category}
           </span>
-          <div className="flex items-center gap-1 font-mono text-xs font-semibold text-neutral-600">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span>{product.rating}</span>
-          </div>
+          <motion.div 
+            className="flex items-center gap-0.5"
+            initial="idle"
+            whileHover="hover"
+          >
+            {[...Array(5)].map((_, i) => (
+                <motion.div
+                key={i}
+                variants={{
+                    idle: { opacity: 0, scale: 0.5 },
+                    hover: { opacity: 1, scale: 1, transition: { delay: i * 0.05 } }
+                }}
+                >
+                <Star className={`w-3.5 h-3.5 ${i < Math.round(product.rating) ? 'fill-amber-400 text-amber-400' : 'text-neutral-300'}`} />
+                </motion.div>
+            ))}
+            <span className="ml-1 font-mono text-xs font-semibold text-neutral-600">{product.rating}</span>
+          </motion.div>
         </div>
 
         {/* Title */}
@@ -135,48 +164,42 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </p>
 
         {/* Pricing and Quick Add button */}
-        <div className="mt-auto flex items-center justify-between gap-3 pt-3.5 border-t border-neutral-50">
+        <div className="mt-auto flex items-center justify-between gap-3 pt-3.5 border-t border-neutral-50" id={`product-actions-${product.id}`}>
           <div className="flex flex-col">
             {product.originalPrice && (
               <span className="text-xs text-neutral-400 line-through font-medium">
                 ${product.originalPrice.toFixed(2)}
               </span>
             )}
-            <span className="text-base md:text-lg font-sans font-extrabold text-neutral-900">
+            <span className="text-base md:text-xl font-sans font-extrabold text-neutral-900 tracking-tight">
               ${product.price.toFixed(2)}
             </span>
           </div>
 
-          <div className="flex gap-1.5">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCardClick();
-              }}
-              className="bg-neutral-50 hover:bg-neutral-100 text-neutral-600 p-2 rounded-lg border border-neutral-200 transition-colors"
-              title="More info"
-            >
-              <Info className="w-4 h-4" />
-            </button>
-            <button
-              disabled={product.stock <= 0 || quickAddStatus !== 'idle'}
-              onClick={handleQuickAdd}
-              className={`flex items-center justify-center gap-1 px-3 py-2 rounded-lg font-sans text-xs font-bold transition-all cursor-pointer ${
-                product.stock <= 0
-                  ? 'bg-neutral-100 border border-neutral-250 text-neutral-400 cursor-not-allowed'
-                  : quickAddStatus === 'added'
-                  ? 'bg-green-600 border border-green-600 text-white'
-                  : 'bg-orange-600 border border-orange-600 text-white hover:bg-orange-700 active:scale-95'
-              }`}
-              id={`quick-add-${product.id}`}
-            >
-              {quickAddStatus === 'adding' ? (
-                <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}><ShoppingCart className="w-3.5 h-3.5" /></motion.div>
-              ) : quickAddStatus === 'added' ? (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}><CheckCircle2 className="w-3.5 h-3.5" /></motion.div>
-              ) : <ShoppingCart className="w-3.5 h-3.5" />}
-              <span>{quickAddStatus === 'idle' ? 'Quick Add' : quickAddStatus === 'adding' ? 'Adding...' : 'Added'}</span>
-            </button>
+          <div className="flex gap-2 flex-1 justify-end max-w-[180px]">
+             <Button
+                variant="tertiary"
+                size="md"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCardClick();
+                }}
+                className="hidden sm:flex"
+                icon={<Info className="w-4 h-4" />}
+                aria-label="Product details"
+             />
+             <Button
+                variant="primary"
+                size="md"
+                className="flex-1 sm:flex-none sm:min-w-[120px]"
+                disabled={product.stock <= 0}
+                isLoading={quickAddStatus === 'adding'}
+                isSuccess={quickAddStatus === 'added'}
+                onClick={handleQuickAdd}
+                icon={<ShoppingCart className="w-4 h-4" />}
+             >
+                {product.stock <= 0 ? 'Out' : 'Add'}
+             </Button>
           </div>
         </div>
       </div>

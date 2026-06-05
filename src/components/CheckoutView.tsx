@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { CheckCircle, Truck, PhoneCall, AlertCircle, ShoppingBag, ArrowLeft, Landmark } from 'lucide-react';
 import { ShippingDetails } from '../types';
+import { Button } from './Button';
 
 export const CheckoutView: React.FC = () => {
   const { cart, activeCoupon, placeOrder, setView } = useApp();
@@ -75,12 +76,14 @@ export const CheckoutView: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-16 text-center font-sans">
         <h2 className="text-xl font-bold font-sans text-neutral-800">Your Checkout is empty</h2>
         <p className="text-neutral-500 text-xs mt-2">Add items on Burak Mart before accessing our secure checkout.</p>
-        <button
+        <Button
+          variant="primary"
+          size="md"
+          className="mt-6 px-10"
           onClick={() => setView('catalog')}
-          className="mt-6 inline-flex items-center gap-2 cursor-pointer px-5 py-2.5 bg-orange-600 border border-orange-600 text-white rounded-xl text-sm font-semibold hover:bg-orange-700"
         >
           Check Catalog Products
-        </button>
+        </Button>
       </div>
     );
   }
@@ -89,13 +92,15 @@ export const CheckoutView: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 font-sans" id="checkout-workspace">
       
       {/* Return to cart button */}
-      <button
+      <Button
+        variant="tertiary"
+        size="md"
         onClick={() => setView('cart')}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 hover:text-orange-600 transition-colors py-2 mb-6 cursor-pointer focus:outline-hidden"
+        className="mb-6 bg-transparent hover:bg-neutral-50 !p-0 !h-auto text-neutral-500 hover:text-orange-600 border-none"
+        icon={<ArrowLeft className="w-4 h-4" />}
       >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Return to your shopping bag</span>
-      </button>
+        Return to your shopping bag
+      </Button>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
@@ -366,31 +371,18 @@ export const CheckoutView: React.FC = () => {
             </div>
 
             {/* Main Checkout Click */}
-            <button
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              className="mt-6"
               onClick={handleSubmit}
-              disabled={submitting}
-              className={`w-full mt-6 py-4.5 rounded-xl font-sans text-sm font-extrabold text-white text-center cursor-pointer shadow-sm transition-all flex items-center justify-center gap-2 ${
-                submitting
-                  ? 'bg-neutral-800 cursor-not-allowed'
-                  : 'bg-orange-600 border border-orange-600 hover:bg-orange-700 active:scale-97'
-              }`}
+              isLoading={submitting}
+              icon={<CheckCircle className="w-5 h-5" />}
               id="submit-checkout-form-btn"
             >
-              {submitting ? (
-                <div className="flex items-center gap-2">
-                  <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Processing Checkout...</span>
-                </div>
-              ) : (
-                <>
-                  <CheckCircle className="w-5 h-5 shrink-0" />
-                  <span>Confirm order on Cash on Delivery</span>
-                </>
-              )}
-            </button>
+                Confirm order on Cash on Delivery
+            </Button>
 
             {/* Quick Guarantees Badge */}
             <div className="mt-5 pt-4.5 border-t border-neutral-100 flex items-center justify-center gap-2 text-neutral-500 text-[10px] font-mono uppercase font-semibold">

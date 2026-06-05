@@ -8,7 +8,9 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { ShoppingCart, Trash2, ArrowRight, Tag, HelpCircle, Truck, PackageCheck, Compass } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
+import { Button } from './Button';
+import { LazyImage } from './LazyImage';
 
 export const CartView: React.FC = () => {
   const { 
@@ -66,12 +68,15 @@ export const CartView: React.FC = () => {
         <p className="text-neutral-500 text-xs max-w-sm mx-auto mt-2.5 leading-relaxed">
           Looks like you haven&apos;t added any items to your design bag yet. Experience fast Cash on Delivery inside!
         </p>
-        <button
+        <Button
+          variant="primary"
+          size="md"
+          className="mt-6 px-8"
           onClick={() => setView('catalog')}
-          className="mt-6 inline-flex items-center gap-2 cursor-pointer px-5 py-2.5 bg-orange-600 border border-orange-600 text-white hover:bg-orange-700 font-sans font-bold text-xs rounded-xl transition-all"
+          icon={<Compass className="w-4 h-4" />}
         >
-          <Compass className="w-4 h-4" /> Start browsing products
-        </button>
+          Start browsing products
+        </Button>
       </div>
     );
   }
@@ -119,17 +124,15 @@ export const CartView: React.FC = () => {
                 id={`cart-item-${item.product.id}`}
               >
                 {/* Image */}
-                <div 
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-150 flex items-center justify-center shrink-0 cursor-pointer"
+                <LazyImage 
+                  src={item.product.image} 
+                  alt={item.product.name} 
+                  fill 
+                  referrerPolicy="no-referrer" 
+                  className="object-cover object-center"
+                  wrapperClassName="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-150 shrink-0 cursor-pointer"
                   onClick={() => handleProductNavigate(item.product.id)}
-                >
-                  <img
-                    src={item.product.image}
-                    alt={item.product.name}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-center"
-                  />
-                </div>
+                />
 
                 {/* Details */}
                 <div className="flex-1 flex flex-col justify-between">
@@ -214,14 +217,16 @@ export const CartView: React.FC = () => {
                 placeholder="e.g. BURAK10"
                 value={promoCodeInput}
                 onChange={(e) => setPromoCodeInput(e.target.value)}
-                className="flex-1 pl-3.5 pr-2 py-2 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-xs font-mono font-semibold uppercase"
+                className="flex-1 pl-3.5 pr-2 py-2 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-xs font-mono font-semibold uppercase h-12"
               />
-              <button
+              <Button
                 type="submit"
-                className="bg-neutral-900 border border-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold px-4 cursor-pointer"
+                variant="tertiary"
+                size="md"
+                className="bg-neutral-900 text-white min-w-[80px]"
               >
                 Apply
-              </button>
+              </Button>
             </form>
 
             {promoFeedback && (
@@ -285,14 +290,17 @@ export const CartView: React.FC = () => {
             </div>
 
             {/* Checkout CTA */}
-            <button
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              className="mt-6"
               onClick={() => setView('checkout')}
-              className="w-full mt-6 flex items-center justify-center gap-2 py-3 bg-orange-600 border border-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-bold shadow-xs active:scale-98 transition-all cursor-pointer font-sans"
+              icon={<ArrowRight className="w-5 h-5 animate-pulse" />}
               id="proceed-checkout-btn"
             >
-              <span>Proceed to Checkout</span>
-              <ArrowRight className="w-4 h-4 animate-pulse" />
-            </button>
+                Proceed to Checkout
+            </Button>
 
             {/* Quick Guarantees Badge Group */}
             <div className="mt-5 space-y-2 pt-4 border-t border-neutral-100 text-[10px] text-neutral-500 font-mono font-semibold uppercase tracking-wider text-center" id="summary-guarantees">

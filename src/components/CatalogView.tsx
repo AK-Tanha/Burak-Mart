@@ -9,7 +9,8 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { ProductCard } from './ProductCard';
 import { ArrowDownAZ, ArrowUpAZ, Sparkles, Filter, Compass, Undo2 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
+import { Button } from './Button';
 
 interface CatalogViewProps {
   categoryFilter: string;
@@ -84,17 +85,15 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         {/* Flat Category selector list */}
         <div className="flex flex-wrap gap-2" id="department-filters">
           {categories.map((cat) => (
-            <button
+            <Button
               key={cat}
+              variant={categoryFilter === cat ? 'primary' : 'tertiary'}
+              size="sm"
+              className={`rounded-xl border ${categoryFilter === cat ? 'border-orange-600' : 'border-neutral-200 bg-white'}`}
               onClick={() => setCategoryFilter(cat)}
-              className={`px-4 py-2 border rounded-xl font-sans text-xs font-bold transition-all cursor-pointer capitalize ${
-                categoryFilter === cat
-                  ? 'bg-orange-600 border-orange-600 text-white shadow-xs'
-                  : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-350'
-              }`}
             >
               {cat === 'all' ? 'All Collections' : cat}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -125,24 +124,29 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           <p className="text-neutral-500 text-xs mt-2 max-w-sm mx-auto leading-relaxed">
             Please double-check spelling or try switching categories. You may also clear your active filters.
           </p>
-          <div className="flex justify-center gap-3 mt-6">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 mt-6">
             {searchQuery && (
-              <button
+              <Button
+                variant="tertiary"
+                size="md"
+                className="bg-neutral-900 text-white"
                 onClick={() => setSearchQuery('')}
-                className="bg-neutral-900 border border-neutral-900/90 hover:bg-neutral-800 text-white font-sans font-bold text-xs rounded-xl px-4 py-2 cursor-pointer"
               >
                 Clear Search Phrase
-              </button>
+              </Button>
             )}
-            <button
+            <Button
+              variant="secondary"
+              size="md"
+              className="border-neutral-250 text-neutral-700 bg-white"
               onClick={() => {
                 setCategoryFilter('all');
                 setSearchQuery('');
               }}
-              className="bg-white border border-neutral-250 text-neutral-700 hover:bg-neutral-50 font-sans font-bold text-xs rounded-xl px-4 py-2 cursor-pointer flex items-center gap-1.5"
+              icon={<Undo2 className="w-3.5 h-3.5 animate-pulse" />}
             >
-              <Undo2 className="w-3.5 h-3.5 animate-pulse" /> Reset Filters
-            </button>
+               Reset Filters
+            </Button>
           </div>
         </div>
       ) : (

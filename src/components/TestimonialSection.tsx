@@ -1,6 +1,6 @@
 import React from 'react';
 import { Star } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 const testimonials = [
   { name: 'Sarah J.', location: 'New York, USA', rating: 5, quote: 'Absolutely love the quality. The shipping was fast and the product exceeded my expectations!' },

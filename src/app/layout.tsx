@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, DM_Sans } from 'next/font/google';
+import { Outfit, Inter } from 'next/font/google';
 import "./globals.css";
 import { GoogleAnalytics } from "../components/GoogleAnalytics";
 
-const bebasNeue = Bebas_Neue({
-  weight: '400',
+const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-headline',
 });
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-body',
 });
@@ -25,8 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${bebasNeue.variable} ${dmSans.variable}`}>
-      <body className="antialiased font-body text-charcoal">
+    <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
+      <body className="antialiased font-body text-[var(--color-text-main)] bg-[var(--color-surface-base)]">
         <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
         {children}
       </body>

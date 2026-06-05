@@ -1,5 +1,5 @@
 'use client'
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { ToastManager } from './ToastManager';
 import { BottomNav } from './BottomNav';
 import { useApp } from '../context/AppContext';
