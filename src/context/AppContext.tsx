@@ -9,18 +9,22 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, CartItem, Order, Coupon, AppView, ShippingDetails, Review } from '../types';
 import { INITIAL_PRODUCTS, INITIAL_COUPONS } from '../data/initialProducts';
 
+export type AppPortal = 'store' | 'admin' | 'customer' | 'login';
+
 interface AppContextType {
   products: Product[];
   coupons: Coupon[];
   cart: CartItem[];
   orders: Order[];
   currentView: AppView;
+  currentPortal: AppPortal;
   selectedProductId: string | null;
   activeOrderTrackingId: string | null;
   adminPasswordVerified: boolean;
   
   // Navigation
   setView: (view: AppView) => void;
+  setPortal: (portal: AppPortal) => void;
   setSelectedProductId: (id: string | null) => void;
   setActiveOrderTrackingId: (id: string | null) => void;
   setAdminPasswordVerified: (verified: boolean) => void;
@@ -161,6 +165,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [currentView, setView] = useState<AppView>('home');
+  const [currentPortal, setPortal] = useState<AppPortal>('store');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [activeOrderTrackingId, setActiveOrderTrackingId] = useState<string | null>(null);
   const [adminPasswordVerified, setAdminPasswordVerified] = useState<boolean>(false);
@@ -457,10 +462,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         cart,
         orders,
         currentView,
+        currentPortal,
         selectedProductId,
         activeOrderTrackingId,
         adminPasswordVerified,
         setView,
+        setPortal,
         setSelectedProductId,
         setActiveOrderTrackingId,
         setAdminPasswordVerified,

@@ -15,14 +15,28 @@ import { CartView } from './components/CartView';
 import { CheckoutView } from './components/CheckoutView';
 import { OrderTrackingView } from './components/OrderTrackingView';
 import { AdminPanel } from './components/AdminPanel';
+import { CustomerDashboard } from './components/CustomerDashboard';
+import { LoginView } from './components/LoginView';
 import { Footer } from './components/Footer';
 
 function AppContent() {
-  const { currentView, setView } = useApp();
+  const { currentView, currentPortal, setView, setPortal } = useApp();
   
   // High-capacity filtered query handlers synced across header searches and catalogs
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  if (currentPortal === 'admin') {
+    return <AdminPanel />;
+  }
+
+  if (currentPortal === 'customer') {
+    return <CustomerDashboard />; 
+  }
+  
+  if (currentPortal === 'login') {
+    return <LoginView />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-orange-100 text-slate-800 font-sans" id="store-root-app">

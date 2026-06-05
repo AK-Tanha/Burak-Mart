@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { ProductCard } from './ProductCard';
 import { Sparkles, ArrowRight, Compass, ShieldCheck, Heart, BookmarkCheck } from 'lucide-react';
@@ -18,6 +18,20 @@ interface HomeViewProps {
 export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
   const { products, setView, setSelectedProductId } = useApp();
 
+  const heroImages = [
+    "https://images.unsplash.com/photo-1537151608828-ea2b117b6281?w=800&auto=format&fit=crop&q=85",
+    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop&q=85",
+    "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&auto=format&fit=crop&q=85"
+  ];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 4);
 
   const handleCategoryClick = (category: string) => {
@@ -29,56 +43,57 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
     <div className="font-sans flex flex-col gap-12 md:gap-16 pb-12" id="store-front-home">
       
       {/* 1. EDITORIAL HERO BANNER */}
-      <section className="relative w-full rounded-3xl overflow-hidden bg-neutral-900 min-h-[460px] flex items-center md:px-12 px-6 shadow-sm border border-neutral-800" id="editorial-hero">
-        {/* Unsplash Editorial background image (overlayed with transparent shading blur) */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1537151608828-ea2b117b6281?w=1600&auto=format&fit=crop&q=85"
-            alt="Burak Mart Editorial fashion"
-            referrerPolicy="no-referrer"
-            className="w-full h-full object-cover object-center opacity-45 brightness-75 filter saturate-[1.1]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-900/60 to-transparent"></div>
-        </div>
-
-        {/* Content Wrapper */}
-        <div className="relative z-10 max-w-xl text-left text-white flex flex-col gap-5 py-12">
-          
-          <div className="inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-400/30 text-orange-355 text-orange-400 font-mono text-[10px] md:text-[11px] font-bold tracking-widest px-3 py-1 rounded-full uppercase">
-            <Sparkles className="w-3.5 h-3.5 animate-pulse" /> New Season Released
-          </div>
-
-          <h1 className="text-4xl md:text-5xl font-sans font-extrabold tracking-tight leading-none text-neutral-50 mb-1">
-            Redefining Lifestyle.
-          </h1>
-          <p className="text-sm md:text-base text-neutral-300 leading-relaxed font-sans font-medium">
-            Explore Burak Mart &apos;s tailored selection of trendy apparel, minimal wristwatches, waterproof leather backpacks, and Italian-stitched suede loafers. Absolute authenticity, standard & express doorstep couriers, and risk-free payments.
-          </p>
-
-          <div className="flex flex-wrap gap-3 mt-4">
-            <button
-              onClick={() => {
-                setCategoryFilter('all');
-                setView('catalog');
-              }}
-              className="bg-orange-600 hover:bg-orange-700 text-white font-sans font-bold text-xs rounded-xl px-6 py-3.5 flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-97"
-              id="hero-discover-btn"
-            >
-              <span>Discover Collection</span>
-              <ArrowRight className="w-4 h-4 animate-pulse" />
-            </button>
+      <section className="relative w-full rounded-3xl overflow-hidden bg-neutral-900 min-h-[350px] shadow-sm border border-neutral-800" id="editorial-hero">
+        <div className="flex flex-col md:flex-row items-center w-full h-full">
+          {/* Content Wrapper */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex-1 text-left text-white px-8 md:px-12 py-12 md:py-16 flex flex-col gap-4"
+          >
             
-            <button
-              onClick={() => {
-                setCategoryFilter('all');
-                setView('catalog');
-              }}
-              className="bg-white/10 hover:bg-white/15 text-white font-sans font-semibold text-xs border border-white/20 rounded-xl px-5 py-3.5 transition-all cursor-pointer backdrop-blur-xs"
-            >
-              See Trend Book
-            </button>
-          </div>
+            <div className="inline-flex items-center gap-1.5 bg-orange-500/10 border border-orange-400/30 text-orange-400 font-mono text-[10px] md:text-[11px] font-bold tracking-widest px-3 py-1 rounded-full uppercase self-start">
+              <Sparkles className="w-3.5 h-3.5 animate-pulse" /> New Collection
+            </div>
 
+            <h1 className="text-3xl md:text-5xl font-sans font-extrabold tracking-tight leading-tight text-neutral-50 mb-1">
+              Fresh Trends, Delivered.
+            </h1>
+            <p className="text-xs md:text-sm text-neutral-300 leading-relaxed font-sans font-medium max-w-sm">
+              Discover our latest apparel, accessories, and footwear. High-quality items designed to elevate your everyday look.
+            </p>
+
+            <div className="flex flex-wrap gap-3 mt-2">
+              <button
+                onClick={() => {
+                  setCategoryFilter('all');
+                  setView('catalog');
+                }}
+                className="bg-orange-600 hover:bg-orange-700 text-white font-sans font-bold text-xs rounded-xl px-6 py-3 flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-97"
+                id="hero-discover-btn"
+              >
+                <span>Shop All Products</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+          
+          {/* Hero Image */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="flex-1 w-full h-full min-h-[250px] md:min-h-[350px] relative"
+          >
+            <img
+              src={heroImages[currentImageIndex]}
+              alt="Burak Mart Editorial fashion"
+              referrerPolicy="no-referrer"
+              className="w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-neutral-900 via-transparent to-transparent"></div>
+          </motion.div>
         </div>
       </section>
 

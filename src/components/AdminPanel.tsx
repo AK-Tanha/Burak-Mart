@@ -11,8 +11,10 @@ import { Product, Order, Coupon } from '../types';
 import { 
   DollarSign, ShoppingCart, Percent, AlertTriangle, 
   Trash2, Edit, Plus, CheckCircle, Package, ArrowRight,
-  User, Calendar, ShieldCheck, KeyRound, Ban, ArrowDown, HelpCircle 
+  User, Calendar, ShieldCheck, KeyRound, Ban, ArrowDown, HelpCircle,
+  LayoutDashboard, Box, ListOrdered, Ticket 
 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 export const AdminPanel: React.FC = () => {
   const { 
@@ -26,7 +28,8 @@ export const AdminPanel: React.FC = () => {
     deleteProduct,
     updateOrderStatus, 
     addCoupon, 
-    deleteCoupon 
+    deleteCoupon,
+    setPortal
   } = useApp();
 
   // Authentication Pin state
@@ -202,55 +205,58 @@ export const AdminPanel: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 font-sans mb-12" id="admin-workspace">
-      
-      {/* Header Administration */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping shrink-0" />
-            <span className="font-mono text-[10px] text-orange-700 bg-orange-50 font-bold uppercase tracking-widest px-2 py-0.5 rounded-md">
-              Security Checked Mode
-            </span>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-sans font-extrabold text-neutral-900 mt-1 tracking-tight">
-            Burak Mart Manager Board
-          </h1>
+    <div className="flex min-h-screen bg-slate-50 font-sans" id="admin-workspace">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r border-slate-200 p-6 flex flex-col gap-8">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-orange-600 flex items-center justify-center text-white font-bold">B</div>
+          <span className="font-extrabold text-lg text-slate-900 tracking-tight">Burak Manager</span>
         </div>
-
-        {/* Action button to sign out */}
+        
+        <nav className="flex flex-col gap-2">
+          {[
+            { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+            { id: 'products', label: 'Inventory', icon: Box },
+            { id: 'orders', label: 'Orders', icon: ListOrdered },
+            { id: 'coupons', label: 'Vouchers', icon: Ticket }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setAdminTab(tab.id as any)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wide transition-colors cursor-pointer ${
+                adminTab === tab.id
+                  ? 'bg-orange-50 text-orange-700'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+        
         <button
           onClick={() => {
             setAdminPasswordVerified(false);
             setPasswordInput('');
+            setPortal('store');
           }}
-          className="text-xs font-bold text-neutral-500 hover:text-red-600 bg-neutral-100 hover:bg-red-50 border border-neutral-200 hover:border-red-100 px-4 py-2 rounded-xl transition-colors cursor-pointer"
+          className="mt-auto text-slate-400 hover:text-red-500 font-bold text-xs flex items-center gap-2 cursor-pointer"
         >
-          Sign Out Manager Mode
+          Sign Out
         </button>
-      </div>
+      </aside>
 
-      {/* Tabs Menu Navigation */}
-      <div className="flex border-b border-neutral-200 mb-8 overflow-x-auto gap-1" id="admin-tabs-list">
-        {[
-          { id: 'overview', label: 'Store Overview Metrics' },
-          { id: 'products', label: 'Item Inventory catalog' },
-          { id: 'orders', label: 'Buyers Order Lists' },
-          { id: 'coupons', label: 'Coupon Vouchers' }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setAdminTab(tab.id as any)}
-            className={`px-5 py-3.5 text-xs font-sans font-bold uppercase tracking-tight relative -mb-[1px] whitespace-nowrap cursor-pointer transition-colors ${
-              adminTab === tab.id
-                ? 'text-orange-600 border-b-2 border-orange-600'
-                : 'text-neutral-500 hover:text-neutral-800'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Main Content */}
+      <main className="flex-1 p-8 overflow-y-auto">
+        <div className="max-w-6xl mx-auto flex flex-col gap-8">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                {adminTab === 'overview' ? 'Dashboard Overview' : 
+                 adminTab === 'products' ? 'Inventory Management' :
+                 adminTab === 'orders' ? 'Order Management' : 'Voucher Management'}
+            </h1>
+      
+      {/* Action button to sign out (moved to sidebar) */}
 
       {/* TABS VIEW CONTROLLER */}
 
@@ -319,53 +325,23 @@ export const AdminPanel: React.FC = () => {
               <p className="text-neutral-400 text-xs mb-6">Demonstrates gross sales volume metrics.</p>
 
               {/* Responsive Vector element representation */}
-              <div className="relative min-h-[220px] w-full" id="bespoke-svg-dashboard-element">
-                <svg className="w-full h-[200px]" viewBox="0 0 500 200" preserveAspectRatio="none">
-                  {/* Grid Lines */}
-                  <line x1="0" y1="50" x2="500" y2="50" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="4" />
-                  <line x1="0" y1="100" x2="500" y2="100" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="4" />
-                  <line x1="0" y1="150" x2="500" y2="150" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="4" />
-                  
-                  {/* Fill Area Chart */}
-                  <path
-                    d="M 0 180 Q 80 140 150 110 T 300 80 T 420 50 L 500 40 L 500 200 L 0 200 Z"
-                    fill="url(#orange-sales-gradient)"
-                    opacity="0.1"
-                  />
-                  
-                  {/* Sales Curve Line */}
-                  <path
-                    d="M 0 180 Q 80 140 150 110 T 300 80 T 420 50 L 500 40"
-                    fill="none"
-                    stroke="#f97316"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                  />
-
-                  {/* Nodes */}
-                  <circle cx="150" cy="110" r="4.5" fill="#f97316" stroke="#ffffff" strokeWidth="1.5" />
-                  <circle cx="300" cy="80" r="4.5" fill="#f97316" stroke="#ffffff" strokeWidth="1.5" />
-                  <circle cx="420" cy="50" r="4.5" fill="#f97316" stroke="#ffffff" strokeWidth="1.5" />
-                  <circle cx="500" cy="40" r="5.5" fill="#7c2d12" stroke="#ffffff" strokeWidth="2" />
-
-                  {/* Definitions */}
-                  <defs>
-                    <linearGradient id="orange-sales-gradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f97316" />
-                      <stop offset="100%" stopColor="#ffedd5" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-
-                {/* X labels list */}
-                <div className="flex justify-between items-center text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-widest mt-2 px-1">
-                  <span>April 01</span>
-                  <span>April 15</span>
-                  <span>May 01</span>
-                  <span>May 15</span>
-                  <span>June 01</span>
-                  <span>Today (Verified)</span>
-                </div>
+              <div className="h-[250px] w-full" id="bespoke-svg-dashboard-element">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={[
+                    { name: 'Apr 01', sales: 4000 },
+                    { name: 'Apr 15', sales: 3000 },
+                    { name: 'May 01', sales: 2000 },
+                    { name: 'May 15', sales: 2780 },
+                    { name: 'Jun 01', sales: 1890 },
+                    { name: 'Today', sales: 2390 },
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
+                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
+                    <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                    <Line type="monotone" dataKey="sales" stroke="#f97316" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
 
             </div>
@@ -861,10 +837,10 @@ export const AdminPanel: React.FC = () => {
             </div>
 
           </div>
-
         </div>
       )}
-
+      </div>
+      </main>
     </div>
   );
 };
