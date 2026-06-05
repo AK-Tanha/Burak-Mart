@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { ShoppingBag, Truck, ShieldCheck, Search, Menu, X, Settings2, Home, Compass, Clipboard } from 'lucide-react';
+import { ShoppingBag, Truck, ShieldCheck, Search, Menu, X, Settings2, Home, Compass, Clipboard, ArrowRight, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface HeaderProps {
@@ -16,8 +16,9 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) => {
-  const { currentView, setView, cart, setSelectedProductId } = useApp();
+  const { currentView, setView, cart, setSelectedProductId, updateCartQuantity, removeFromCart } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
 
   const cartTotalItems = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -36,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
   return (
     <header className="sticky top-0 z-50 w-full" id="site-header">
       {/* Top Banner with Store Guarantees */}
-      <div className="bg-neutral-950 text-neutral-200 py-2.5 text-xs font-sans tracking-wide border-b border-neutral-800" id="top-announcement-bar">
+      <div className="bg-neutral-950 text-neutral-200 py-2.5 text-xs font-sans tracking-wide border-b border-neutral-800 hidden md:block" id="top-announcement-bar">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
           <div className="flex items-center gap-1.5 text-slate-300 font-medium">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
@@ -196,31 +197,94 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
             </button>
  
             {/* Shopping Cart Trigger */}
-            <button
-              onClick={() => handleNavigate('cart')}
-              className={`relative flex items-center justify-center p-2.5 rounded-xl border transition-all hover:scale-102 cursor-pointer ${
-                currentView === 'cart'
-                  ? 'bg-orange-600 border-orange-600 text-white'
-                  : 'bg-orange-50 border-orange-100 text-orange-800 hover:bg-orange-100/80'
-              }`}
-              id="cart-trigger-button"
-            >
-              <ShoppingBag className="w-4.5 h-4.5" />
-              <span className="ml-1.5 hidden sm:inline text-xs font-bold">Cart</span>
-              
-              {cartTotalItems > 0 && (
-                <span 
-                  className={`absolute -top-1.5 -right-1.5 min-w-5 h-5 flex items-center justify-center text-[10px] font-sans font-bold rounded-full border shadow-sm px-1 ${
-                    currentView === 'cart' 
-                      ? 'bg-slate-950 border-slate-900 text-white' 
-                      : 'bg-orange-600 border-white text-white'
-                  }`}
-                  id="cart-badge-count"
-                >
-                  {cartTotalItems}
-                </span>
+            <div className="relative">
+              <button
+                onClick={() => setCartDropdownOpen(!cartDropdownOpen)}
+                className={`relative flex items-center justify-center p-2.5 rounded-xl border transition-all hover:scale-102 cursor-pointer ${
+                  cartDropdownOpen || currentView === 'cart'
+                    ? 'bg-orange-600 border-orange-600 text-white'
+                    : 'bg-orange-50 border-orange-100 text-orange-800 hover:bg-orange-100/80'
+                }`}
+                id="cart-trigger-button"
+              >
+                <ShoppingBag className="w-4.5 h-4.5" />
+                <span className="ml-1.5 hidden sm:inline text-xs font-bold">Cart</span>
+                
+                {cartTotalItems > 0 && (
+                  <span 
+                    className={`absolute -top-1.5 -right-1.5 min-w-5 h-5 flex items-center justify-center text-[10px] font-sans font-bold rounded-full border shadow-sm px-1 ${
+                      cartDropdownOpen || currentView === 'cart'
+                        ? 'bg-slate-950 border-slate-900 text-white' 
+                        : 'bg-orange-600 border-white text-white'
+                    }`}
+                    id="cart-badge-count"
+                  >
+                    {cartTotalItems}
+                  </span>
+                )}
+              </button>
+
+              {cartDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-slate-200 shadow-xl rounded-2xl z-50 p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-bold text-sm">Your Cart ({cartTotalItems})</h3>
+                    <button onClick={() => setCartDropdownOpen(false)} className="text-slate-400 hover:text-slate-600">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  {cart.length === 0 ? (
+                    <p className="text-sm text-slate-500 py-4 text-center">Your cart is empty.</p>
+                  ) : (
+                    <>
+                      <div className="space-y-3 max-h-60 overflow-y-auto mb-4">
+                        {cart.map((item) => (
+                          <div key={`${item.product.id}-${item.selectedSize}-${item.selectedColor}`} className="flex items-center gap-3 border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+                            <img src={item.product.image} alt={item.product.name} className="w-12 h-12 object-cover rounded-lg" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-slate-800">{item.product.name}</p>
+                              <p className="text-xs text-slate-500">{item.selectedSize} / {item.selectedColor}</p>
+                              <p className="text-xs text-slate-600 mt-1 font-mono">
+                                ${item.product.price.toFixed(2)} × {item.quantity} = ${(item.product.price * item.quantity).toFixed(2)}
+                              </p>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <div className="flex items-center gap-1">
+                                <button 
+                                  onClick={() => updateCartQuantity(item.product.id, item.quantity - 1, item.selectedSize, item.selectedColor)}
+                                  className="w-6 h-6 flex items-center justify-center border rounded-md hover:bg-slate-100"
+                                >-</button>
+                                <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
+                                <button 
+                                  onClick={() => updateCartQuantity(item.product.id, item.quantity + 1, item.selectedSize, item.selectedColor)}
+                                  className="w-6 h-6 flex items-center justify-center border rounded-md hover:bg-slate-100"
+                                >+</button>
+                              </div>
+                              <button
+                                onClick={() => removeFromCart(item.product.id, item.selectedSize, item.selectedColor)}
+                                className="text-[10px] text-red-500 hover:text-red-700 flex items-center gap-1"
+                                title="Remove item"
+                              >
+                                <Trash2 className="w-3 h-3" /> Remove
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setCartDropdownOpen(false);
+                          handleNavigate('cart');
+                        }}
+                        className="w-full bg-neutral-900 text-white py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-neutral-800"
+                      >
+                        View Shopping Bag <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
               )}
-            </button>
+            </div>
  
             {/* Mobile Hamburger menu Button */}
             <button
