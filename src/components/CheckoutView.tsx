@@ -1,0 +1,408 @@
+'use client';
+
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState } from 'react';
+import { useApp } from '../context/AppContext';
+import { CheckCircle, Truck, PhoneCall, AlertCircle, ShoppingBag, ArrowLeft, Landmark } from 'lucide-react';
+import { ShippingDetails } from '../types';
+
+export const CheckoutView: React.FC = () => {
+  const { cart, activeCoupon, placeOrder, setView } = useApp();
+
+  const [formData, setFormData] = useState<ShippingDetails>({
+    fullName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    notes: ''
+  });
+
+  const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  // Math totals
+  const subtotal = cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
+  
+  let discountAmount = 0;
+  if (activeCoupon) {
+    if (activeCoupon.discountType === 'percentage') {
+      discountAmount = (subtotal * activeCoupon.value) / 100;
+    } else {
+      discountAmount = activeCoupon.value;
+    }
+  }
+
+  const shippingCost = shippingMethod === 'express' ? 9.99 : subtotal >= 50.00 ? 0.00 : 5.99;
+  const total = Math.max(0, subtotal - discountAmount + shippingCost);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    // Field safety validations
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.address.trim() || !formData.city.trim() || !formData.postalCode.trim()) {
+      setErrorMsg('Please fully complete all required delivery details.');
+      return;
+    }
+
+    setSubmitting(true);
+
+    // Simulate standard fast database record creations
+    setTimeout(() => {
+      const order = placeOrder(formData, shippingMethod);
+      setSubmitting(false);
+      
+      if (!order) {
+        setErrorMsg('Fatal checkout error. Unable to process empty carts.');
+      }
+    }, 1200);
+  };
+
+  if (cart.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center font-sans">
+        <h2 className="text-xl font-bold font-sans text-neutral-800">Your Checkout is empty</h2>
+        <p className="text-neutral-500 text-xs mt-2">Add items on Burak Mart before accessing our secure checkout.</p>
+        <button
+          onClick={() => setView('catalog')}
+          className="mt-6 inline-flex items-center gap-2 cursor-pointer px-5 py-2.5 bg-orange-600 border border-orange-600 text-white rounded-xl text-sm font-semibold hover:bg-orange-700"
+        >
+          Check Catalog Products
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 font-sans" id="checkout-workspace">
+      
+      {/* Return to cart button */}
+      <button
+        onClick={() => setView('cart')}
+        className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 hover:text-orange-600 transition-colors py-2 mb-6 cursor-pointer focus:outline-hidden"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Return to your shopping bag</span>
+      </button>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Left Side: Dynamic Shipping Form */}
+        <div className="lg:col-span-7">
+          <form onSubmit={handleSubmit} className="bg-white border border-neutral-100 rounded-3xl p-5 md:p-8 shadow-xs flex flex-col gap-6" id="checkout-form">
+            <div>
+              <h2 className="text-xl font-sans font-extrabold text-neutral-900">
+                Secure Delivery Details
+              </h2>
+              <p className="text-xs text-neutral-400 mt-1">
+                Provide correct information to ensure seamless deliveries and immediate updates on your order.
+              </p>
+            </div>
+
+            {errorMsg && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-xl flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {/* Inputs Core */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                  Full Customer Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="e.g. Burak Erdogan"
+                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="e.g. email@example.com"
+                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                  Mobile Phone Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="e.g. +90 555 123 4567"
+                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-mono font-semibold"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                  Delivery Home Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Street name, apartment, building number..."
+                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                  City <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="e.g. Istanbul"
+                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                  Postal/Zip Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="postalCode"
+                  value={formData.postalCode}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="e.g. 34367"
+                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-mono font-semibold"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                  Custom Delivery Instruction Notes (Optional)
+                </label>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                  rows={2}
+                  placeholder="Leave with neighbor, buzzer code, call at arrival..."
+                  className="w-full pl-3.5 pr-2 py-2 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="h-[1px] bg-neutral-100"></div>
+
+            {/* Delivery Shipping Method Choice */}
+            <div>
+              <h3 className="font-sans font-bold text-neutral-800 text-sm mb-3">
+                Select Shipping Courier Level
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3" id="shipping-method-selection">
+                {/* Standard Card */}
+                <button
+                  type="button"
+                  onClick={() => setShippingMethod('standard')}
+                  className={`p-4 border rounded-2xl text-left flex gap-3 transition-colors cursor-pointer ${
+                    shippingMethod === 'standard'
+                      ? 'bg-orange-50/70 border-orange-600 text-orange-805'
+                      : 'bg-white border-neutral-250 text-neutral-600 hover:border-neutral-350'
+                  }`}
+                >
+                  <Truck className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="block text-xs font-bold uppercase tracking-tight">Standard Fast Delivery</span>
+                    <span className="block text-[10px] text-neutral-400 mt-1">Delivered in 3 to 5 business days</span>
+                    <span className="block text-xs font-extrabold mt-1">
+                      {subtotal >= 50.00 ? 'FREE' : '$5.99'}
+                    </span>
+                  </div>
+                </button>
+
+                {/* Express Card */}
+                <button
+                  type="button"
+                  onClick={() => setShippingMethod('express')}
+                  className={`p-4 border rounded-2xl text-left flex gap-3 transition-colors cursor-pointer ${
+                    shippingMethod === 'express'
+                      ? 'bg-orange-50/70 border-orange-600 text-orange-805'
+                      : 'bg-white border-neutral-250 text-neutral-600 hover:border-neutral-350'
+                  }`}
+                >
+                  <Truck className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="block text-xs font-bold uppercase tracking-tight">Premium Express Delivery</span>
+                    <span className="block text-[10px] text-neutral-400 mt-1">Priority transit in 1 to 2 business days</span>
+                    <span className="block text-xs font-extrabold text-neutral-800 mt-1">$9.99</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div className="h-[1px] bg-neutral-100"></div>
+
+            {/* Payment Method Details (Cash On Delivery) */}
+            <div>
+              <h3 className="font-sans font-bold text-neutral-800 text-sm mb-3">
+                Trusted Payment Choice
+              </h3>
+              <div className="bg-orange-50/60 rounded-2xl p-4 border border-orange-100 flex gap-4 text-orange-900" id="payment-method-card">
+                <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center text-white shrink-0 mt-0.5 shadow-xs">
+                  <Landmark className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="block text-xs font-bold uppercase tracking-wide">Cash on Delivery (COD)</span>
+                  <p className="text-xs text-neutral-500 leading-relaxed mt-1">
+                    Zero prepayment required! Inspect the package, verify authenticity, and pay standard, authentic cash exactly at your doorstep. Safe, reliable, and completely worry-free!
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        {/* Right Side: Order Items checkout summary */}
+        <div className="lg:col-span-5" id="checkout-summary-column">
+          <div className="bg-white border border-neutral-150 rounded-3xl p-5 shadow-xs sticky top-28">
+            <h3 className="font-sans font-extrabold text-neutral-800 text-sm mb-4 pb-2 border-b border-neutral-50 flex items-center gap-1.5 justify-between">
+              <span>Order Summary</span>
+              <span className="text-xs font-normal text-neutral-400">({cart.reduce((s, c) => s + c.quantity, 0)} items)</span>
+            </h3>
+
+            {/* Mini Items Lists */}
+            <div className="space-y-3 max-h-[220px] overflow-y-auto mb-5 pr-2">
+              {cart.map((item) => (
+                <div key={`${item.product.id}-${item.selectedColor}-${item.selectedSize}`} className="flex items-center gap-3.5 text-xs text-neutral-600">
+                  <div className="w-11 h-11 bg-neutral-50 border rounded-lg overflow-hidden shrink-0">
+                    <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="block font-semibold text-neutral-800 truncate">{item.product.name}</span>
+                    <span className="block text-[10px] text-neutral-400 font-mono uppercase mt-0.5">
+                      Qty: {item.quantity} {item.selectedSize ? `| Size: ${item.selectedSize}` : ''}
+                    </span>
+                  </div>
+                  <span className="font-mono font-bold text-neutral-800 shrink-0">
+                    ${(item.product.price * item.quantity).toFixed(2)}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="h-[1px] bg-neutral-100 my-4" />
+
+            {/* Calculations summaries */}
+            <div className="space-y-3.5 text-xs text-neutral-600">
+              <div className="flex justify-between">
+                <span>Items Subtotal</span>
+                <span className="font-semibold text-neutral-800">${subtotal.toFixed(2)}</span>
+              </div>
+
+              {activeCoupon && (
+                <div className="flex justify-between text-orange-700 font-semibold bg-orange-50 border border-orange-100 rounded-lg p-2">
+                  <span>Promo Coupon Discount</span>
+                  <span>-${discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+
+              <div className="flex justify-between">
+                <span className="flex items-center gap-1">
+                  <span>Shipping & Delivery Cost</span>
+                  {shippingMethod === 'express' && <span className="text-[10px] bg-amber-50 text-amber-700 px-1 border rounded-sm">Express</span>}
+                </span>
+                <span className="font-mono font-semibold text-neutral-800">
+                  {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
+                </span>
+              </div>
+
+              <div className="h-[1px] bg-neutral-100 my-4"></div>
+
+              <div className="flex justify-between items-baseline">
+                <span className="text-sm font-bold text-neutral-800 font-sans">Final Total (COD)</span>
+                <div className="text-right">
+                  <span className="text-xl md:text-2xl font-sans font-extrabold text-neutral-950">
+                    ${total.toFixed(2)}
+                  </span>
+                  <span className="block text-[9px] font-mono text-orange-600 font-bold uppercase mt-0.5">
+                    Pay Cash On Delivery
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Checkout Click */}
+            <button
+              onClick={handleSubmit}
+              disabled={submitting}
+              className={`w-full mt-6 py-4.5 rounded-xl font-sans text-sm font-extrabold text-white text-center cursor-pointer shadow-sm transition-all flex items-center justify-center gap-2 ${
+                submitting
+                  ? 'bg-neutral-800 cursor-not-allowed'
+                  : 'bg-orange-600 border border-orange-600 hover:bg-orange-700 active:scale-97'
+              }`}
+              id="submit-checkout-form-btn"
+            >
+              {submitting ? (
+                <div className="flex items-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Processing Checkout...</span>
+                </div>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5 shrink-0" />
+                  <span>Confirm order on Cash on Delivery</span>
+                </>
+              )}
+            </button>
+
+            {/* Quick Guarantees Badge */}
+            <div className="mt-5 pt-4.5 border-t border-neutral-100 flex items-center justify-center gap-2 text-neutral-500 text-[10px] font-mono uppercase font-semibold">
+              <PhoneCall className="w-4 h-4 text-orange-600 animate-bounce" />
+              <span>Free COD doorstep inspection</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  );
+};

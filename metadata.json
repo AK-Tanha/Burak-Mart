@@ -1,0 +1,6 @@
+{
+  "name": "Burak Mart",
+  "description": "Your trusted online shop for trendy fashion, accessories, and more. Fast Delivery | Cash on Delivery | 100% Authentic Products.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
