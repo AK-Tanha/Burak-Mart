@@ -85,26 +85,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Hot Badges */}
         <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 items-start">
           {product.isNew && (
-            <motion.span
-              key="new-badge"
-              initial={{ rotate: 0, scale: 0 }}
-              animate={{ rotate: 360, scale: 1 }}
-              transition={{ duration: 0.6 }}
-              className="bg-yellow-400 text-neutral-900 font-mono font-bold text-[9px] tracking-widest uppercase px-2 py-0.5 rounded-md shadow-xs origin-center"
-            >
-              NEW
-            </motion.span>
-          )}
-          {discountPercent > 0 && (
-            <motion.span
-              key="discount-badge"
-              animate={{ scale: [1, 1.15, 1] }}
-              transition={{ repeat: Infinity, duration: 0.8 }}
-              className="bg-red-500 text-white font-mono font-bold text-[10px] tracking-wide px-2 py-0.5 rounded-md shadow-xs"
-            >
-              SAVE {discountPercent}%
-            </motion.span>
-          )}
+              <motion.span
+                key="new-badge"
+                initial={{ rotate: 0, scale: 0 }}
+                animate={{ rotate: 360, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                className="bg-accent-yellow text-navy font-display font-bold text-[10px] tracking-widest uppercase px-2 py-1 rounded-md shadow-xs origin-center"
+              >
+                NEW
+              </motion.span>
+            )}
+            {discountPercent > 0 && (
+              <motion.span
+                key="discount-badge"
+                animate={{ scale: [1, 1.15, 1] }}
+                transition={{ repeat: Infinity, duration: 0.8 }}
+                className="bg-error text-white font-display font-bold text-[11px] tracking-wide px-2 py-1 rounded-md shadow-xs"
+              >
+                SAVE {discountPercent}%
+              </motion.span>
+            )}
         </div>
 
         {/* Authentic Protection Shield */}
@@ -130,7 +130,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="p-4 md:p-5 flex flex-col flex-1">
         {/* Category & Badge Row */}
         <div className="flex items-center justify-between gap-2 mb-1.5">
-          <span className="font-mono text-[10px] text-neutral-400 font-semibold uppercase tracking-wider">
+          <span className="font-mono text-[10px] text-accent-yellow font-extrabold uppercase tracking-widest">
             {product.category}
           </span>
           <motion.div 
@@ -154,7 +154,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Title */}
-        <h3 className="font-sans font-bold text-slate-800 text-sm md:text-base leading-snug group-hover:text-orange-600 transition-colors line-clamp-2 mb-2">
+        <h3 className="font-sans font-bold text-slate-800 text-sm md:text-base leading-snug group-hover:text-accent-yellow transition-colors line-clamp-2 mb-2">
           {product.name}
         </h3>
 
@@ -171,7 +171,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 ${product.originalPrice.toFixed(2)}
               </span>
             )}
-            <span className="text-base md:text-xl font-sans font-extrabold text-neutral-900 tracking-tight">
+            <span className="text-base md:text-2xl font-display font-bold text-navy tracking-tight">
               ${product.price.toFixed(2)}
             </span>
           </div>

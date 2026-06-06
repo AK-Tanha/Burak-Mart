@@ -91,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
                         <polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="none" stroke="#171717" strokeWidth="4" />
                     </svg>
                 </div>
-                <span className="hidden md:block font-sans font-extrabold text-neutral-900 tracking-tight text-lg">BURAK MART</span>
+                <span className="hidden md:block font-display font-bold text-neutral-900 tracking-tight text-3xl mt-1">BURAK MART</span>
             </button>
           </div>
           

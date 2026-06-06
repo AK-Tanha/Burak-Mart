@@ -12,10 +12,10 @@ export const TestimonialSection: React.FC = () => {
   return (
     <section className="bg-white py-16 px-4 md:px-12" id="testimonial-section">
       <div className="max-w-[1600px] mx-auto">
-        <h2 className="text-3xl font-headline font-bold text-primary mb-12 text-center tracking-wide">
-          WHAT OUR CUSTOMERS SAY
+        <h2 className="text-4xl md:text-5xl font-display text-navy mb-12 text-center tracking-tight uppercase">
+          What our customers say
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((t, i) => (
             <motion.div 
               key={i}
@@ -23,23 +23,23 @@ export const TestimonialSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm"
+              className="bg-bg-light p-8 rounded-3xl border border-slate-100 shadow-xs hover:shadow-md transition-shadow"
             >
-              <div className="flex text-accent mb-4">
+              <div className="flex text-accent-yellow mb-4">
                 {[...Array(5)].map((_, j) => (
                   <Star key={j} className={`w-4 h-4 ${j < t.rating ? 'fill-current' : ''}`} />
                 ))}
               </div>
-              <p className="text-charcoal font-body text-sm leading-relaxed mb-6 italic">
+              <p className="text-navy font-body text-sm leading-relaxed mb-6 font-medium italic opacity-80">
                 "{t.quote}"
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-headline font-bold">
+                <div className="w-12 h-12 rounded-full bg-navy flex items-center justify-center text-accent-yellow font-display font-bold text-xl">
                   {t.name[0]}
                 </div>
                 <div>
-                  <strong className="block text-sm font-headline font-bold text-primary">{t.name}</strong>
-                  <span className="text-xs text-charcoal">{t.location}</span>
+                  <strong className="block text-sm font-display font-bold text-navy tracking-wide uppercase">{t.name}</strong>
+                  <span className="text-xs text-neutral-400 font-body uppercase tracking-widest">{t.location}</span>
                 </div>
               </div>
             </motion.div>

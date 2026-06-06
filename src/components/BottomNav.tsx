@@ -40,7 +40,7 @@ export const BottomNav: React.FC = () => {
                         >
                             <div className="relative group p-1">
                                 <nav.icon 
-                                    className={`w-6 h-6 transition-all duration-300 ${isActive ? 'text-orange-600 scale-110' : 'text-slate-400 group-hover:text-slate-600'}`} 
+                                    className={`w-6 h-6 transition-all duration-300 ${isActive ? 'text-accent-yellow scale-110' : 'text-slate-400 group-hover:text-slate-600'}`} 
                                     strokeWidth={isActive ? 2.5 : 2}
                                 />
                                 
@@ -50,22 +50,22 @@ export const BottomNav: React.FC = () => {
                                             initial={{ scale: 0, opacity: 0 }}
                                             animate={{ scale: 1, opacity: 1 }}
                                             exit={{ scale: 0, opacity: 0 }}
-                                            className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-white shadow-sm"
+                                            className="absolute -top-1 -right-1 bg-error text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-white shadow-sm"
                                         >
                                             {nav.badge}
                                         </motion.span>
                                     )}
                                 </AnimatePresence>
-
+ 
                                 {isActive && (
                                     <motion.div 
                                         layoutId="bottom-nav-indicator"
-                                        className="absolute -top-1 left-1.5 right-1.5 h-0.5 bg-orange-600 rounded-full"
+                                        className="absolute -top-1 left-1.5 right-1.5 h-0.5 bg-accent-yellow rounded-full"
                                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                     />
                                 )}
                             </div>
-                            <span className={`text-[9px] font-bold tracking-tight uppercase transition-colors duration-300 ${isActive ? 'text-orange-600' : 'text-slate-400'}`}>
+                            <span className={`text-[9px] font-bold tracking-tight uppercase transition-colors duration-300 ${isActive ? 'text-accent-yellow' : 'text-slate-400'}`}>
                                 {nav.name}
                             </span>
                         </button>

@@ -31,11 +31,11 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = "relative overflow-hidden inline-flex items-center justify-center font-bold tracking-tight uppercase transition-all duration-300 rounded-xl active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   
   const variants = {
-    primary: "bg-accent text-primary shadow-sm hover:bg-yellow-400 hover:shadow-md",
-    secondary: "bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-primary",
-    tertiary: "bg-slate-100 text-primary hover:bg-slate-200",
-    success: "bg-green-500 text-white",
-    error: "bg-red-500 text-white",
+    primary: "bg-accent-yellow text-navy shadow-sm hover:brightness-105 hover:shadow-md",
+    secondary: "bg-transparent border-2 border-accent-yellow text-accent-yellow hover:bg-accent-yellow hover:text-navy",
+    tertiary: "bg-neutral-100 text-navy hover:bg-neutral-200",
+    success: "bg-success text-white",
+    error: "bg-error text-white",
   };
 
   const sizes = {

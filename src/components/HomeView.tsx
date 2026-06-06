@@ -74,12 +74,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
   };
 
   return (
-    <div className="font-sans px-4 py-8 md:px-12 md:py-12 bg-slate-50 min-h-screen" id="store-front-home">
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-4">
+    <div className="font-body px-4 py-8 md:px-12 md:py-12 bg-bg-light min-h-screen" id="store-front-home">
+      <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6">
         
         {/* 1. EDITORIAL HERO BANNER - Modern Redesign (xl:col-span-12) */}
-        <section className="xl:col-span-12 relative rounded-3xl p-8 md:p-16 bg-neutral-950 shadow-xl overflow-hidden flex items-center min-h-[500px]" id="editorial-hero">
-            <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col lg:flex-row items-center gap-10">
+        <section className="xl:col-span-12 relative rounded-[2.5rem] p-8 md:p-16 bg-navy shadow-2xl overflow-hidden flex items-center min-h-[500px]" id="editorial-hero">
+            <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col lg:flex-row items-center gap-12">
                 
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
@@ -88,31 +88,31 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
                     className="flex-1 text-left flex flex-col gap-6"
                 >
                     <CompactTrustBadgeBar />
-                    <h1 className="text-4xl md:text-6xl font-bold font-headline text-white leading-[1.1] tracking-tight">
-                        Master Your Style, Elevate Your Vibe.
+                    <h1 className="text-5xl md:text-8xl font-display text-white leading-[0.85] tracking-tight uppercase">
+                        Fresh Trends,<br /><span className="text-accent-yellow">Delivered.</span>
                     </h1>
-                    <p className="text-lg md:text-xl text-neutral-300 leading-relaxed max-w-lg">
-                        Unmatched quality meets trend-forward design. The finishing touches that define your unique identity.
+                    <p className="text-lg md:text-xl text-neutral-400 leading-relaxed max-w-lg font-body font-medium opacity-80">
+                        Discover our latest apparel, accessories, and footwear. High-quality items designed to elevate your everyday look.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 mt-6 w-full sm:w-auto">
                         <Button
                             variant="primary"
                             size="lg"
                             fullWidth
-                            className="sm:w-auto px-10"
+                            className="sm:w-auto px-12 py-6 font-display text-lg tracking-widest"
                             onClick={() => { setCategoryFilter('all'); setView('catalog'); }}
                             icon={<ArrowRight className="w-5 h-5" />}
                         >
-                            Explore Now
+                            EXPLORE NOW
                         </Button>
                         <Button
                             variant="secondary"
                             size="lg"
                             fullWidth
-                            className="sm:w-auto px-10 border-white/20 text-white hover:bg-white/10"
+                            className="sm:w-auto px-12 py-6 border-white/20 text-white hover:bg-white/10 font-display text-lg tracking-widest"
                             onClick={() => { setCategoryFilter('all'); setView('catalog'); }}
                         >
-                            Browse Collections
+                            BROWSE COLLECTION
                         </Button>
                     </div>
                 </motion.div>
@@ -121,7 +121,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="w-full lg:w-1/2 h-[350px] md:h-[450px] relative rounded-3xl overflow-hidden shadow-2xl"
+                    className="w-full lg:w-1/2 h-[350px] md:h-[500px] relative rounded-[2rem] overflow-hidden shadow-2xl skew-y-1 lg:-rotate-2 hover:rotate-0 transition-transform duration-700"
                 >
                     <LazyImage
                         src={heroImages[currentImageIndex]}
@@ -132,7 +132,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
                         wrapperClassName="w-full h-full"
                         priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent"></div>
                 </motion.div>
             </div>
         </section>
@@ -140,23 +140,24 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
 
         {/* 1.5 JUST FOR YOU - Bento Style (xl:col-span-4) */}
         {favorites.length > 0 && (
-          <section className="xl:col-span-4 bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col gap-4" id="just-for-you">
-            <h3 className="text-xl font-sans font-extrabold text-neutral-900">Just For You</h3>
-            <div className="flex flex-col gap-3">
+          <section className="xl:col-span-4 bg-white rounded-[2rem] p-8 border border-neutral-100 shadow-xs flex flex-col gap-6" id="just-for-you">
+            <h3 className="text-2xl font-display font-bold text-navy uppercase tracking-tight">Just For You</h3>
+            <div className="flex flex-col gap-4">
               {products.filter(p => favorites.includes(p.id)).slice(0, 3).map(prod => (
-                <div key={prod.id} className="flex gap-3 items-center group cursor-pointer" onClick={() => { setSelectedProductId(prod.id); setView('product'); }}>
+                <div key={prod.id} className="flex gap-4 items-center group cursor-pointer" onClick={() => { setSelectedProductId(prod.id); setView('product'); }}>
                   <LazyImage 
                     src={prod.image} 
                     alt={prod.name} 
                     fill 
                     referrerPolicy="no-referrer" 
-                    className="object-cover"
-                    wrapperClassName="w-16 h-16 rounded-xl overflow-hidden bg-neutral-100"
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    wrapperClassName="w-20 h-20 rounded-2xl overflow-hidden bg-bg-light border border-neutral-50"
                   />
-                  <div>
-                    <strong className="block text-sm font-sans font-bold group-hover:text-orange-600 transition-colors">{prod.name}</strong>
-                    <span className="text-xs text-neutral-500">${prod.price}</span>
+                  <div className="flex-1">
+                    <strong className="block text-sm font-display font-bold text-navy group-hover:text-accent-yellow transition-colors uppercase tracking-wide">{prod.name}</strong>
+                    <span className="text-xs font-mono font-bold text-neutral-400 mt-1 block uppercase tracking-widest">${prod.price}</span>
                   </div>
+                  <ArrowRight className="w-4 h-4 text-neutral-200 group-hover:text-accent-yellow group-hover:translate-x-1 transition-all" />
                 </div>
               ))}
             </div>
@@ -164,24 +165,27 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
         )}
 
         {/* 2. PROMOTIONAL BOX - Bento Style (xl:col-span-4) */}
-        <section className="xl:col-span-4 bg-white rounded-3xl p-8 border border-slate-200 flex flex-col gap-4 shadow-sm" id="trust-campaign-panel">
-            <span className="inline-flex items-center gap-1.5 text-orange-800 bg-orange-50 text-[10px] font-mono font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 border border-orange-100 self-start">
-                <Sparkles className="w-4 h-4 text-orange-600" /> Limited Time
+        <section className="xl:col-span-4 bg-navy rounded-[2rem] p-8 border border-white/10 flex flex-col gap-4 shadow-xl relative overflow-hidden group" id="trust-campaign-panel">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Sparkles className="w-24 h-24 text-accent-yellow" />
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-accent-yellow bg-white/5 text-[10px] font-mono font-extrabold uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-accent-yellow/20 self-start">
+                <Sparkles className="w-4 h-4" /> Limited Benefit
             </span>
-            <h3 className="text-xl font-sans font-extrabold text-neutral-900">
-                Unlock 10% Off
+            <h3 className="text-3xl font-display font-bold text-white uppercase tracking-tight leading-tight mt-2">
+                Unlock 10%<br /><span className="text-accent-yellow">Off Extra</span>
             </h3>
-            <p className="text-xs text-neutral-500 leading-relaxed font-sans">
-                Drop Code <strong className="font-mono text-neutral-850">BURAK10</strong> inside your shopping bag for extra savings!
+            <p className="text-sm text-neutral-400 leading-relaxed font-body font-medium">
+                Apply code <strong className="font-mono text-accent-yellow bg-white/5 px-2 py-0.5 rounded shadow-inner">BURAK10</strong> at checkout for bonus savings.
             </p>
             <Button
-              variant="tertiary"
+              variant="primary"
               size="md"
               fullWidth
-              className="mt-4 bg-slate-900 text-white hover:bg-slate-800"
+              className="mt-4 font-display tracking-widest text-sm py-4"
               onClick={() => { setCategoryFilter('all'); setView('catalog'); }}
             >
-                Shop Now
+                SHOP TRENDS NOW
             </Button>
         </section>
 
@@ -189,12 +193,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
         <section className="xl:col-span-12 py-10" id="curated-collections">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 px-2">
             <div>
-              <h2 className="text-3xl md:text-4xl font-sans font-extrabold text-neutral-900 tracking-tight">Curated Collections</h2>
-              <p className="text-neutral-500 mt-2 font-medium">Select visual departments to start catalog filtering</p>
+              <h2 className="text-4xl md:text-5xl font-display text-neutral-900 tracking-tight uppercase">Curated Collections</h2>
+              <p className="text-neutral-500 mt-2 font-body font-medium">Select visual departments to start catalog filtering</p>
             </div>
             <button 
               onClick={() => { setCategoryFilter('all'); setView('catalog'); }}
-              className="text-orange-600 font-bold hover:underline underline-offset-4 transition-all"
+              className="text-accent-yellow font-bold hover:underline underline-offset-4 transition-all uppercase tracking-wider text-sm"
             >
               Show all collections
             </button>
@@ -242,15 +246,15 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
                 
                 <div className="absolute inset-0 p-8 flex flex-col justify-end items-start">
-                  <div className="relative z-10">
-                    <span className="block text-[10px] md:text-xs font-mono font-bold tracking-[0.2em] text-orange-400 uppercase mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                  <div className="relative z-10 w-full">
+                    <span className="block text-[10px] md:text-xs font-mono font-bold tracking-[0.3em] text-accent-yellow uppercase mb-3 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
                       {cluster.count} Products Available
                     </span>
-                    <h3 className="text-2xl md:text-3xl font-sans font-extrabold text-white leading-tight mb-4 group-hover:text-accent transition-colors duration-300">
+                    <h3 className="text-3xl md:text-4xl font-display font-bold text-white leading-[0.9] mb-6 group-hover:text-accent-yellow transition-colors duration-300 uppercase tracking-tight">
                       {cluster.title}
                     </h3>
-                    <div className="flex items-center gap-2 bg-white text-neutral-900 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-accent">
-                      Shop Now <ArrowRight className="w-4 h-4" />
+                    <div className="inline-flex items-center gap-3 bg-accent-yellow text-navy px-8 py-3.5 rounded-2xl text-[10px] font-display font-bold uppercase tracking-[0.2em] opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:scale-105 active:scale-95 shadow-xl">
+                      Explore Collection <ArrowRight className="w-4 h-4" />
                     </div>
                   </div>
                 </div>
@@ -264,18 +268,18 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
         </section>
 
         {/* 4. TRENDING PRODUCTS - Interactive Carousel Redesign */}
-        <section className="xl:col-span-12 py-10" id="trending-products-section">
-            <div className="flex items-end justify-between mb-8 px-2">
+        <section className="xl:col-span-12 py-16" id="trending-products-section">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 px-2 gap-6">
               <div>
-                <h2 className="text-3xl font-sans font-extrabold text-neutral-900 tracking-tight underline decoration-orange-500/30 underline-offset-8">Trending This Week</h2>
-                <p className="text-neutral-500 mt-3 font-medium text-sm max-w-md">Specially hand-selected trending items currently high in user demand based on real-time sales data.</p>
+                <h2 className="text-4xl md:text-6xl font-display text-navy tracking-tight uppercase leading-[0.9]">Trending <span className="text-accent-yellow">Specials</span></h2>
+                <p className="text-neutral-500 mt-4 font-body font-medium text-base max-w-lg opacity-70 italic border-l-2 border-accent-yellow pl-4">Hand-selected trending items currently high in user demand based on real-time sales data.</p>
               </div>
               <button 
                 onClick={() => setView('catalog')}
-                className="hidden md:flex items-center gap-2 text-orange-600 font-bold hover:translate-x-1 transition-all text-sm group"
+                className="flex items-center gap-3 text-navy font-display font-bold hover:translate-x-2 transition-all text-sm group uppercase tracking-[0.2em] bg-bg-light px-8 py-4 rounded-2xl border border-neutral-100 shadow-xs"
               >
-                Discover complete catalog 
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                Full Catalog
+                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1 text-accent-yellow" />
               </button>
             </div>
 
@@ -283,7 +287,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
               {/* Navigation Arrows (Desktop) */}
               <button 
                 onClick={() => scrollCarousel('left')}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 z-20 bg-white border border-slate-200 shadow-xl rounded-full p-4 text-slate-800 opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 transition-all duration-300 hidden lg:flex hover:bg-orange-600 hover:text-white cursor-pointer"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 z-20 bg-navy text-accent-yellow shadow-2xl rounded-2xl p-5 opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 transition-all duration-300 hidden lg:flex hover:scale-110 active:scale-90 cursor-pointer border border-white/10"
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="w-6 h-6" />
@@ -291,7 +295,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
               
               <button 
                 onClick={() => scrollCarousel('right')}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 z-20 bg-white border border-slate-200 shadow-xl rounded-full p-4 text-slate-800 opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 transition-all duration-300 hidden lg:flex hover:bg-orange-600 hover:text-white cursor-pointer"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 z-20 bg-navy text-accent-yellow shadow-2xl rounded-2xl p-5 opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 transition-all duration-300 hidden lg:flex hover:scale-110 active:scale-90 cursor-pointer border border-white/10"
                 aria-label="Scroll right"
               >
                 <ChevronRight className="w-6 h-6" />
