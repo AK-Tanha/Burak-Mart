@@ -74,8 +74,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
   };
 
   return (
-    <div className="font-body px-4 py-8 md:px-12 md:py-12 bg-bg-light min-h-screen" id="store-front-home">
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6">
+    <div className="font-body bg-bg-light min-h-screen pb-8" id="store-front-home">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6">
         
         {/* 1. EDITORIAL HERO BANNER - Modern Redesign (xl:col-span-12) */}
         <section className="xl:col-span-12 relative rounded-[2.5rem] p-8 md:p-16 bg-navy shadow-2xl overflow-hidden flex items-center min-h-[500px]" id="editorial-hero">

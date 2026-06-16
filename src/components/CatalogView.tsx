@@ -66,7 +66,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     <div className="font-body flex flex-col gap-8 pb-12" id="catalog-discover-view">
       
       {/* Title block */}
-      <div className="border-l-4 border-accent-yellow pl-6 py-2">
+      <div className="border-l-4 border-accent-yellow pl-6 py-2 md:mt-8">
         <h1 className="text-3xl md:text-5xl font-display text-navy tracking-tight leading-none uppercase">
           Burak Mart Collections
         </h1>

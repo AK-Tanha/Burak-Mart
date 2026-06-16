@@ -5,10 +5,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { ShoppingBag, Truck, ShieldCheck, Search, Menu, X, Settings2, Home, Compass, Clipboard, ArrowRight, Trash2, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { LazyImage } from './LazyImage';
 
 interface HeaderProps {
   searchQuery: string;
@@ -20,13 +21,32 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const cartDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-        setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const y = window.scrollY;
+          setIsScrolled(prev => y > 80 ? true : y < 20 ? false : prev);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (cartDropdownRef.current && !cartDropdownRef.current.contains(e.target as Node)) {
+        setCartDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const cartTotalItems = cart.reduce((total, item) => total + item.quantity, 0);
@@ -46,8 +66,9 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
   return (
     <header className="sticky top-0 z-50 w-full" id="site-header">
       {/* Top Banner with Store Guarantees */}
-      <div className="bg-neutral-950 text-neutral-200 py-2.5 text-xs font-sans tracking-wide border-b border-neutral-800 hidden md:block" id="top-announcement-bar">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
+      {!isScrolled && (
+      <div className="bg-neutral-950 text-neutral-200 text-xs font-sans tracking-wide border-b border-neutral-800 hidden md:block" id="top-announcement-bar">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2 py-2.5">
           <div className="flex items-center gap-1.5 text-slate-300 font-medium">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
             Welcome to Burak Mart! Your Trusted Trend Boutique
@@ -65,9 +86,10 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
           </div>
         </div>
       </div>
+      )}
 
       {/* Main Navigation Row */}
-      <header className={`fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all duration-300 ${isScrolled ? 'h-[60px] shadow-md' : 'h-[80px] shadow-sm'}`} id="main-nav-bar">
+      <div className={`w-full bg-white/95 backdrop-blur-md border-b border-slate-200 transition-shadow duration-300 h-[80px] ${isScrolled ? 'shadow-md' : 'shadow-sm'}`} id="main-nav-bar">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-full flex items-center justify-between gap-4">
           
           {/* Left: Mobile Hamburger / Desktop Logo */}
@@ -85,13 +107,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
                 className="flex items-center gap-2 cursor-pointer group focus:outline-hidden"
                 id="logo-button"
             >
-                <div className="w-8 h-8 flex items-center justify-center shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-8 h-8 group-hover:scale-105 transition-transform duration-300">
-                        {/* Simplified Logo for brevity inside Header */}
-                        <polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="none" stroke="#171717" strokeWidth="4" />
-                    </svg>
-                </div>
-                <span className="hidden md:block font-display font-bold text-neutral-900 tracking-tight text-3xl mt-1">BURAK MART</span>
+                <img src="/logo.png" alt="Burak Mart" className="h-15 w-auto md:h-12 group-hover:scale-105 transition-transform duration-300" style={{ clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)' }} />
             </button>
           </div>
           
@@ -115,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
             <button className="p-2 text-slate-600 hover:text-orange-600 transition-colors hidden md:block">
                 <Heart className="w-5 h-5" />
             </button>
-            <div className="relative">
+            <div className="relative" ref={cartDropdownRef}>
                 <button
                     onClick={() => setCartDropdownOpen(!cartDropdownOpen)}
                     className="p-2 text-slate-600 hover:text-orange-600 transition-colors relative"
@@ -128,14 +144,90 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
                         </span>
                     )}
                 </button>
+                <AnimatePresence>
+                  {cartDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50"
+                      id="cart-dropdown"
+                    >
+                      <div className="p-4">
+                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+                          Cart ({cartTotalItems} items)
+                        </h3>
+                        {cart.length === 0 ? (
+                          <p className="text-sm text-slate-400 py-4 text-center">Your cart is empty</p>
+                        ) : (
+                          <div className="flex flex-col gap-3 max-h-64 overflow-y-auto">
+                            {cart.slice(0, 5).map((item) => (
+                              <div
+                                key={`${item.product.id}-${item.selectedSize}-${item.selectedColor}`}
+                                className="flex gap-3 items-center cursor-pointer hover:bg-slate-50 rounded-xl p-2 -mx-2 transition-colors"
+                                onClick={() => {
+                                  setSelectedProductId(item.product.id);
+                                  setView('product');
+                                  setCartDropdownOpen(false);
+                                }}
+                              >
+                                <LazyImage
+                                  src={item.product.image}
+                                  alt={item.product.name}
+                                  fill
+                                  referrerPolicy="no-referrer"
+                                  className="object-cover"
+                                  wrapperClassName="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 shrink-0"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <span className="block text-xs font-semibold text-slate-700 truncate">
+                                    {item.product.name}
+                                  </span>
+                                  <span className="block text-[10px] text-slate-400 font-mono mt-0.5">
+                                    {item.quantity} × ${item.product.price.toFixed(2)}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeFromCart(item.product.id, item.selectedSize, item.selectedColor);
+                                  }}
+                                  className="text-slate-300 hover:text-red-500 p-1 transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ))}
+                            {cart.length > 5 && (
+                              <p className="text-[10px] text-slate-400 text-center pt-1">
+                                +{cart.length - 5} more items
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="border-t border-slate-100 p-3">
+                        <button
+                          onClick={() => {
+                            setView('cart');
+                            setCartDropdownOpen(false);
+                          }}
+                          className="w-full py-2.5 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors uppercase tracking-wider"
+                        >
+                          View Full Cart
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
             </div>
           </div>
         </div>
-      </header>
-
+      </div>
 
       {/* Mobile search bar (Visible below md) */}
-      <div className="md:hidden bg-slate-100 px-4 py-2 border-b border-slate-200 flex" id="mobile-search-bar">
+      <div className="md:hidden bg-slate-100 px-4 py-2 border-b border-slate-200" id="mobile-search-bar">
         <div className="w-full relative">
           <input
             type="text"
@@ -161,7 +253,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-white border-b border-slate-200 overflow-hidden shadow-md absolute w-full left-0 font-sans"
+            className="lg:hidden bg-white border-b border-slate-200 overflow-hidden shadow-md font-sans"
             id="mobile-navigation-drawer"
           >
             <div className="px-4 py-5 flex flex-col gap-3.5 bg-slate-50">

@@ -59,63 +59,9 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12" id="footer-main-grid">
         
         {/* About column */}
-        <div className="md:col-span-5 flex flex-col gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 flex items-center justify-center shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-8 h-8" id="burak-mart-logo-svg-footer">
-                <polygon 
-                  points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" 
-                  fill="none" 
-                  stroke="#ffffff" 
-                  strokeWidth="2" 
-                />
-                <polygon 
-                  points="32,8 68,8 92,32 92,68 68,92 32,92 8,68 8,32" 
-                  fill="#171717" 
-                  stroke="#ffffff" 
-                  strokeWidth="0.75" 
-                />
-                
-                {/* Orange slanted tag */}
-                <g transform="rotate(-30 50 48)">
-                  <rect 
-                    x="37" 
-                    y="31" 
-                    width="26" 
-                    height="38" 
-                    rx="3.5" 
-                    fill="#FF7A00" 
-                  />
-                  <circle 
-                    cx="50" 
-                    cy="37" 
-                    r="3" 
-                    fill="#ffffff" 
-                  />
-                </g>
-                
-                {/* Black Shopping Cart, superimposed */}
-                <g stroke="#ffffff" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" transform="translate(6, 4)">
-                  <path d="M 31,39 L 37,39 L 42,51 L 56,51 L 60,42 L 39,42" />
-                  <path d="M 45,42 L 45,51" strokeWidth="1.2" />
-                  <path d="M 49,42 L 49,51" strokeWidth="1.2" />
-                  <path d="M 53,42 L 53,51" strokeWidth="1.2" />
-                  <path d="M 41,46 L 58,46" strokeWidth="1.2" />
-                  <circle cx="43" cy="55" r="1.5" fill="#ffffff" stroke="none" />
-                  <circle cx="55" cy="55" r="1.5" fill="#ffffff" stroke="none" />
-                </g>
-              </svg>
-            </div>
-            <div className="text-left">
-              <span className="block font-sans font-extrabold text-neutral-100 tracking-tight text-lg leading-none">
-                BURAK MART
-              </span>
-              <span className="block text-[9px] font-sans text-orange-500 font-bold uppercase tracking-wide mt-1" style={{ fontFamily: 'Georgia, serif' }}>
-                Try the new best
-              </span>
-            </div>
-          </div>
-          <p className="text-xs text-neutral-400 leading-relaxed font-sans max-w-sm">
+        <div className="md:col-span-5 flex flex-col">
+          <img src="/footer.png" alt="Burak Mart" className="w-full max-w-sm md:max-w-md self-start m-0 p-0" />
+          <p className="text-xs text-neutral-400 leading-relaxed font-sans max-w-sm mt-4">
             Trendy designs, accessories, apparel, and premium footwear. Rest assured taking advantage of secure Cash on Delivery, and inspect packages straight at your doorstep. We stand by our 100% authenticity guarantee!
           </p>
         </div>
