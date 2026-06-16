@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
     <footer className="bg-neutral-900 text-neutral-400 font-sans mt-auto border-t border-neutral-850" id="site-footer">
       
       {/* Guarantees Highlight Row */}
-      <div className="bg-neutral-950 border-b border-neutral-850" id="footer-highlights">
+      {/* <div className="bg-neutral-950 border-b border-neutral-850" id="footer-highlights">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 grid grid-cols-1 md:grid-cols-4 gap-6 text-center text-xs">
           
           <div className="flex flex-col items-center">
@@ -53,7 +53,7 @@ export const Footer: React.FC = () => {
           </div>
 
         </div>
-      </div>
+      </div> */}
 
       {/* Main Footer Block */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12" id="footer-main-grid">
