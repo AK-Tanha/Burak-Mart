@@ -56,7 +56,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       whileHover={{ y: -6, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
       className="group bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-xs transition-all flex flex-col h-full cursor-pointer"
       onClick={handleCardClick}
       id={`product-card-${product.id}`}
@@ -109,7 +109,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Authentic Protection Shield */}
         <div className="absolute top-3.5 right-3.5 bg-neutral-900/40 backdrop-blur-xs p-1 rounded-full text-white hover:bg-neutral-900/60 transition-colors" title="100% Authentic Product">
-          <CheckCircle2 className="w-3.5 h-3.5 text-orange-500" />
+          <CheckCircle2 className="w-3.5 h-3.5 text-accent-yellow" />
         </div>
 
         {/* Stock status banner */}
@@ -146,7 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     hover: { opacity: 1, scale: 1, transition: { delay: i * 0.05 } }
                 }}
                 >
-                <Star className={`w-3.5 h-3.5 ${i < Math.round(product.rating) ? 'fill-amber-400 text-amber-400' : 'text-neutral-300'}`} />
+                <Star className={`w-3.5 h-3.5 ${i < Math.round(product.rating) ? 'fill-accent-yellow text-accent-yellow' : 'text-neutral-300'}`} />
                 </motion.div>
             ))}
             <span className="ml-1 font-mono text-xs font-semibold text-neutral-600">{product.rating}</span>

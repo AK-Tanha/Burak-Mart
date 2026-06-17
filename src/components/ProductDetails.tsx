@@ -5,11 +5,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
-import { ArrowLeft, Star, ShoppingBag, Send, ShieldAlert, BadgeCheck, Truck, RotateCcw, MessageSquarePlus } from 'lucide-react';
+import { ArrowLeft, Star, ShoppingBag, Send, ShieldAlert, BadgeCheck, Truck, RotateCcw, MessageSquarePlus, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './Button';
+import { FormField } from './FormField';
+import { validators } from '../lib/validation';
 import { LazyImage } from './LazyImage';
 
 export const ProductDetails: React.FC = () => {
@@ -57,6 +59,9 @@ export const ProductDetails: React.FC = () => {
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewComment, setNewReviewComment] = useState('');
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
+  const [reviewErrors, setReviewErrors] = useState<{ name?: string; comment?: string }>({});
+  const [reviewTouched, setReviewTouched] = useState<{ name?: boolean; comment?: boolean }>({});
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const discountPercent = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -80,24 +85,53 @@ export const ProductDetails: React.FC = () => {
     setView('cart');
   };
 
+  const validateReview = useCallback(() => {
+    const nameErr = validators.name(newReviewName);
+    const commentErr = validators.text(newReviewComment, 10, 1000);
+    setReviewErrors({ name: nameErr, comment: commentErr });
+    setReviewTouched({ name: true, comment: true });
+    return !nameErr && !commentErr;
+  }, [newReviewName, newReviewComment]);
+
+  const handleReviewNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setNewReviewName(e.target.value);
+    if (reviewTouched.name) {
+      setReviewErrors((prev) => ({ ...prev, name: validators.name(e.target.value) }));
+    }
+  };
+
+  const handleReviewCommentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setNewReviewComment(e.target.value);
+    if (reviewTouched.comment) {
+      setReviewErrors((prev) => ({ ...prev, comment: validators.text(e.target.value, 10, 1000) }));
+    }
+  };
+
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newReviewName.trim() || !newReviewComment.trim()) return;
+    if (!validateReview()) return;
 
-    addProductReview(product.id, {
-      userName: newReviewName,
-      rating: newReviewRating,
-      comment: newReviewComment
-    });
+    setIsSubmittingReview(true);
 
-    setNewReviewName('');
-    setNewReviewComment('');
-    setNewReviewRating(5);
-    setReviewSuccessMsg('Thank you! Your verified customer review was added.');
     setTimeout(() => {
-      setReviewSuccessMsg('');
-      setShowReviewForm(false);
-    }, 2500);
+      addProductReview(product.id, {
+        userName: newReviewName,
+        rating: newReviewRating,
+        comment: newReviewComment
+      });
+
+      setNewReviewName('');
+      setNewReviewComment('');
+      setNewReviewRating(5);
+      setReviewErrors({});
+      setReviewTouched({});
+      setIsSubmittingReview(false);
+      setReviewSuccessMsg('Thank you! Your verified customer review was added.');
+      setTimeout(() => {
+        setReviewSuccessMsg('');
+        setShowReviewForm(false);
+      }, 3000);
+    }, 800);
   };
 
   return (
@@ -413,26 +447,27 @@ export const ProductDetails: React.FC = () => {
                   Write Your Review
                 </h3>
                 
-                {reviewSuccessMsg && (
-                  <div className="bg-orange-50 border border-orange-200 text-orange-855 text-orange-800 text-xs px-3 py-2.5 rounded-lg mb-4">
-                    {reviewSuccessMsg}
-                  </div>
-                )}
+                  {reviewSuccessMsg && (
+                    <div className="bg-accent-yellow/5 border border-accent-yellow/20 text-accent-yellow text-xs px-3 py-2.5 rounded-lg mb-4">
+                      {reviewSuccessMsg}
+                    </div>
+                  )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-xs font-bold text-neutral-600 uppercase mb-1">
-                      Your Full Name
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
-                      placeholder="e.g. John Doe"
-                      value={newReviewName}
-                      onChange={(e) => setNewReviewName(e.target.value)}
-                      required
-                    />
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                  <FormField
+                    label="Your Full Name"
+                    name="reviewName"
+                    value={newReviewName}
+                    onChange={handleReviewNameChange}
+                    onBlur={() => {
+                      setReviewTouched((prev) => ({ ...prev, name: true }));
+                      setReviewErrors((prev) => ({ ...prev, name: validators.name(newReviewName) }));
+                    }}
+                    error={reviewTouched.name ? reviewErrors.name : undefined}
+                    placeholder="e.g. John Doe"
+                    required
+                    disabled={isSubmittingReview}
+                  />
 
                   <div>
                     <label className="block text-xs font-bold text-neutral-600 uppercase mb-1">
@@ -444,11 +479,12 @@ export const ProductDetails: React.FC = () => {
                           type="button"
                           key={star}
                           onClick={() => setNewReviewRating(star)}
-                          className="text-amber-400 focus:outline-hidden hover:scale-110 transition-transform"
+                          disabled={isSubmittingReview}
+                          className="text-accent-yellow focus:outline-hidden hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Star 
                             className={`w-6 h-6 ${
-                              star <= newReviewRating ? 'fill-amber-400' : 'text-neutral-200'
+                              star <= newReviewRating ? 'fill-accent-yellow' : 'text-neutral-200'
                             }`}
                           />
                         </button>
@@ -461,17 +497,22 @@ export const ProductDetails: React.FC = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-xs font-bold text-neutral-600 uppercase mb-1">
-                    Your Feedback Comments
-                  </label>
-                  <textarea
-                    rows={3}
-                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
-                    placeholder="Describe product weight, sizing accuracy, delivery speed..."
+                  <FormField
+                    label="Your Feedback Comments"
+                    name="reviewComment"
                     value={newReviewComment}
-                    onChange={(e) => setNewReviewComment(e.target.value)}
+                    onChange={handleReviewCommentChange}
+                    onBlur={() => {
+                      setReviewTouched((prev) => ({ ...prev, comment: true }));
+                      setReviewErrors((prev) => ({ ...prev, comment: validators.text(newReviewComment, 10, 1000) }));
+                    }}
+                    error={reviewTouched.comment ? reviewErrors.comment : undefined}
+                    placeholder="Describe product weight, sizing accuracy, delivery speed..."
+                    textarea
+                    rows={3}
                     required
-                  ></textarea>
+                    disabled={isSubmittingReview}
+                  />
                 </div>
 
                 <Button
@@ -479,9 +520,10 @@ export const ProductDetails: React.FC = () => {
                   variant="tertiary"
                   size="md"
                   className="bg-neutral-900 text-white"
-                  icon={<Send className="w-4 h-4" />}
+                  icon={isSubmittingReview ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  isLoading={isSubmittingReview}
                 >
-                  Submit Verified Review
+                  {isSubmittingReview ? 'Submitting...' : 'Submit Verified Review'}
                 </Button>
 
               </form>

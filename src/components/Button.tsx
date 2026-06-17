@@ -28,10 +28,10 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   const [isRippling, setIsRippling] = useState(false);
 
-  const baseStyles = "relative overflow-hidden inline-flex items-center justify-center font-bold tracking-tight uppercase transition-all duration-300 rounded-xl active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
+  const baseStyles = "relative overflow-hidden inline-flex items-center justify-center font-bold tracking-tight uppercase rounded-xl active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed hover-lift";
   
   const variants = {
-    primary: "bg-accent-yellow text-navy shadow-sm hover:brightness-105 hover:shadow-md",
+    primary: "bg-accent-yellow text-navy shadow-sm hover:bg-[#FFC700] active:bg-[#FFB800]",
     secondary: "bg-transparent border-2 border-accent-yellow text-accent-yellow hover:bg-accent-yellow hover:text-navy",
     tertiary: "bg-neutral-100 text-navy hover:bg-neutral-200",
     success: "bg-success text-white",

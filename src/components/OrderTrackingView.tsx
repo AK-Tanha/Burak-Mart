@@ -56,7 +56,7 @@ export const OrderTrackingView: React.FC = () => {
       case 'shipped':
         return { step: 3, label: 'In Transit', color: 'bg-purple-500' };
       case 'delivered':
-        return { step: 4, label: 'Package Delivered', color: 'bg-orange-600' };
+        return { step: 4, label: 'Package Delivered', color: 'bg-accent-yellow' };
       default:
         return { step: 1, label: 'Order Placed', color: 'bg-neutral-500' };
     }
@@ -76,22 +76,23 @@ export const OrderTrackingView: React.FC = () => {
         <form onSubmit={handleSearch} className="flex gap-2.5 mt-6 relative">
           <input
             type="text"
+            aria-label="Search order ID or tracking number"
             placeholder="Search Order ID or Tracking Number..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="flex-1 pl-11 pr-4 py-3 bg-white border border-neutral-255 border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-xs font-semibold"
+            className="flex-1 pl-11 pr-4 py-3 bg-white border border-neutral-255 border-neutral-200 rounded-xl hover-input focus:outline-hidden focus:border-accent-yellow focus:ring-1 focus:ring-accent-yellow text-xs font-semibold"
           />
           <Search className="absolute left-4 top-3.5 w-4.5 h-4.5 text-neutral-400 pointer-events-none" />
           <button
             type="submit"
-            className="bg-orange-600 hover:bg-orange-700 text-white font-sans font-bold text-xs rounded-xl px-5 transition-colors cursor-pointer"
+            className="bg-accent-yellow text-navy hover:bg-[#FFC700] font-sans font-bold text-xs rounded-xl px-5 transition-colors cursor-pointer"
           >
             Track
           </button>
         </form>
 
         {errorSearchMsg && (
-          <p className="text-red-500 text-[11px] font-medium text-left mt-2.5" id="search-tracker-error">
+          <p role="alert" className="text-red-500 text-[11px] font-medium text-left mt-2.5" id="search-tracker-error">
             {errorSearchMsg}
           </p>
         )}
@@ -133,7 +134,7 @@ export const OrderTrackingView: React.FC = () => {
                     <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-neutral-400 block">
                       Shipping Speed
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs font-bold font-sans text-orange-700 bg-orange-50 border border-orange-100 rounded-md px-2.5 py-1 mt-1 uppercase">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold font-sans text-accent-yellow bg-accent-yellow/10 border border-accent-yellow/20 rounded-md px-2.5 py-1 mt-1 uppercase">
                       <Truck className="w-3.5 h-3.5" />
                       {trackedOrder.shippingMethod === 'express' ? 'Express Courier (1-2 days)' : 'Standard Delivery (3-5 days)'}
                     </span>
@@ -158,7 +159,7 @@ export const OrderTrackingView: React.FC = () => {
                       {/* Interactive Progress Line */}
                       <div className="absolute top-9 left-6 md:left-[12.5%] right-[12.5%] h-1 bg-neutral-100 hidden md:block">
                         <div 
-                          className="h-full bg-orange-600 transition-all duration-500"
+                          className="h-full bg-accent-yellow transition-all duration-500"
                           style={{
                             width: `${
                               trackedOrder.status === 'pending'
@@ -197,9 +198,9 @@ export const OrderTrackingView: React.FC = () => {
                               <div 
                                 className={`w-12 h-12 rounded-full border-2 flex items-center justify-center shrink-0 z-10 transition-all ${
                                   isPast 
-                                    ? 'bg-orange-600 border-orange-600 text-white shadow-xs' 
+                                    ? 'bg-accent-yellow border-accent-yellow text-navy shadow-xs' 
                                     : isActive 
-                                    ? 'bg-orange-50 border-orange-600 text-orange-800 scale-110 shadow-xs' 
+                                    ? 'bg-accent-yellow/10 border-accent-yellow text-accent-yellow scale-110 shadow-xs' 
                                     : 'bg-white border-neutral-200 text-neutral-400'
                                 }`}
                               >
@@ -208,7 +209,7 @@ export const OrderTrackingView: React.FC = () => {
 
                               {/* Titles */}
                               <div>
-                                <span className={`block text-xs font-bold ${isActive ? 'text-orange-700' : isPast ? 'text-neutral-800' : 'text-neutral-400'}`}>
+                                <span className={`block text-xs font-bold ${isActive ? 'text-accent-yellow' : isPast ? 'text-neutral-800' : 'text-neutral-400'}`}>
                                   {node.label}
                                 </span>
                                 <span className="block text-[10px] text-neutral-400 mt-0.5 leading-snug">
@@ -327,7 +328,7 @@ export const OrderTrackingView: React.FC = () => {
                   </div>
 
                   {trackedOrder.couponCode && (
-                    <div className="flex justify-between text-orange-600 font-semibold">
+                    <div className="flex justify-between text-accent-yellow font-semibold">
                       <span>Discount Coupon ({trackedOrder.couponCode})</span>
                       <span>-${trackedOrder.discountAmount.toFixed(2)}</span>
                     </div>

@@ -149,7 +149,7 @@ export const AdminPanel: React.FC = () => {
       <div className="max-w-md mx-auto px-4 py-16 font-sans flex flex-col items-center justify-center min-h-[55vh]" id="admin-auth-screen">
         <div className="w-full bg-white border border-neutral-150 rounded-3xl p-6 shadow-sm flex flex-col gap-5">
           <div className="flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 mb-4 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-accent-yellow/10 border border-accent-yellow/20 flex items-center justify-center text-accent-yellow mb-4 shadow-xs">
               <KeyRound className="w-5.5 h-5.5" />
             </div>
             <h1 className="text-xl font-sans font-extrabold text-neutral-900 tracking-tight">
@@ -162,28 +162,32 @@ export const AdminPanel: React.FC = () => {
 
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div>
-              <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+              <label htmlFor="admin-password" className="block text-xs font-bold text-neutral-700 uppercase mb-1">
                 Security Password
               </label>
               <input
+                id="admin-password"
                 type="password"
                 placeholder="Type secure password (use burak)"
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 required
-                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-250 rounded-xl focus:outline-hidden focus:border-orange-500 focus:bg-white text-sm font-semibold transition-all text-center"
+                aria-required="true"
+                aria-invalid={!!authError}
+                aria-describedby={authError ? 'admin-auth-error' : undefined}
+                className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-250 rounded-xl hover-input focus:outline-hidden focus:border-accent-yellow focus:bg-white text-sm font-semibold transition-all text-center"
               />
             </div>
 
             {authError && (
-              <p className="text-red-500 text-[11px] font-semibold text-center leading-snug">
+              <p id="admin-auth-error" role="alert" className="text-red-500 text-[11px] font-semibold text-center leading-snug">
                 {authError}
               </p>
             )}
 
             <button
               type="submit"
-              className="w-full py-3 bg-neutral-900 border border-neutral-900 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider hover:bg-neutral-800 transition-colors cursor-pointer"
+                className="w-full py-3 bg-neutral-900 border border-neutral-900 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider hover:bg-neutral-800 hover-lift cursor-pointer"
             >
               Sign In to Admin
             </button>
@@ -194,7 +198,7 @@ export const AdminPanel: React.FC = () => {
           {/* Quick Bypass Button */}
           <button 
             onClick={handleSkipLogin}
-            className="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center justify-center gap-1.5 py-1 select-none cursor-pointer"
+            className="text-xs font-bold text-accent-yellow hover:text-accent-yellow flex items-center justify-center gap-1.5 py-1 select-none cursor-pointer"
           >
             <span>Bypass Authentications (Skip for Development Check)</span>
             <ArrowRight className="w-3.5 h-3.5 animate-pulse" />
@@ -209,7 +213,7 @@ export const AdminPanel: React.FC = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 p-6 flex flex-col gap-8">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-orange-600 flex items-center justify-center text-white font-bold">B</div>
+          <div className="w-8 h-8 rounded-xl bg-accent-yellow flex items-center justify-center text-navy font-bold">B</div>
           <span className="font-extrabold text-lg text-slate-900 tracking-tight">Burak Manager</span>
         </div>
         
@@ -223,11 +227,11 @@ export const AdminPanel: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setAdminTab(tab.id as any)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wide transition-colors cursor-pointer ${
-                adminTab === tab.id
-                  ? 'bg-orange-50 text-orange-700'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wide transition-colors cursor-pointer ${
+                    adminTab === tab.id
+                      ? 'bg-accent-yellow/10 text-accent-yellow'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  }`}
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
@@ -267,13 +271,13 @@ export const AdminPanel: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="admin-kpi-row">
             {/* Sales */}
             <div className="bg-white border border-neutral-100 rounded-2xl p-5 shadow-xs flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 shrink-0 shadow-xs">
+              <div className="w-12 h-12 rounded-xl bg-accent-yellow/10 border border-accent-yellow/20 flex items-center justify-center text-accent-yellow shrink-0 shadow-xs">
                 <DollarSign className="w-5.5 h-5.5" />
               </div>
               <div>
                 <span className="block text-[11px] font-bold font-mono text-neutral-400 uppercase">Gross Sales (COD)</span>
                 <span className="block text-xl font-extrabold text-neutral-900 mt-0.5">${totalSales.toFixed(2)}</span>
-                <span className="block text-[9px] text-orange-600 font-semibold mt-0.5">↑ 14.5% Past month activity</span>
+                <span className="block text-[9px] text-accent-yellow font-semibold mt-0.5">↑ 14.5% Past month activity</span>
               </div>
             </div>
 
@@ -354,7 +358,7 @@ export const AdminPanel: React.FC = () => {
                 </h3>
                 <ul className="space-y-4.5 text-xs text-neutral-600">
                   <li className="flex items-start gap-2">
-                    <span className="w-2.5 h-2.5 bg-orange-500 rounded-full shrink-0 mt-1" />
+                    <span className="w-2.5 h-2.5 bg-accent-yellow rounded-full shrink-0 mt-1" />
                     <span>Real-time persistence enabled via secure <code className="font-mono text-neutral-800 bg-neutral-150 rounded-sm px-1 font-bold">localStorage</code> engines.</span>
                   </li>
                   <li className="flex items-start gap-2">
@@ -368,8 +372,8 @@ export const AdminPanel: React.FC = () => {
                 </ul>
               </div>
 
-              <div className="bg-orange-50 border border-orange-100 rounded-xl p-3.5 text-orange-855 text-orange-800 mt-6 text-xs flex gap-2">
-                <ShieldCheck className="w-5 h-5 shrink-0 text-orange-600" />
+              <div className="bg-accent-yellow/5 border border-accent-yellow/20 rounded-xl p-3.5 text-accent-yellow mt-6 text-xs flex gap-2">
+                <ShieldCheck className="w-5 h-5 shrink-0 text-accent-yellow" />
                 <span>
                   All database logs are currently 100% stable. No integration leaks reported.
                 </span>
@@ -391,7 +395,7 @@ export const AdminPanel: React.FC = () => {
             </h3>
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="inline-flex items-center gap-1.5 cursor-pointer text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 px-3.5 py-2 rounded-xl transition-all"
+              className="inline-flex items-center gap-1.5 cursor-pointer text-xs font-bold text-navy bg-accent-yellow hover:bg-[#FFC700] px-3.5 py-2 rounded-xl transition-all"
             >
               <Plus className="w-4 h-4" /> Add Product Item
             </button>
@@ -406,23 +410,26 @@ export const AdminPanel: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Product Title</label>
+                  <label htmlFor="prod-name" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Product Title</label>
                   <input
+                    id="prod-name"
                     type="text"
                     required
+                    aria-required="true"
                     placeholder="e.g. Trendy Oversized Knit Sweater"
                     value={newProdName}
                     onChange={(e) => setNewProdName(e.target.value)}
-                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 font-sans"
+                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 hover-input focus:outline-hidden focus:border-accent-yellow focus:ring-1 focus:ring-accent-yellow font-sans"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Category Category</label>
+                  <label htmlFor="prod-category" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Category</label>
                   <select
+                    id="prod-category"
                     value={newProdCategory}
                     onChange={(e) => setNewProdCategory(e.target.value)}
-                    className="w-full bg-white border border-neutral-200 rounded-xl px-3 py-2 text-xs text-neutral-800 focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 font-sans"
+                    className="w-full bg-white border border-neutral-200 rounded-xl px-3 py-2 text-xs text-neutral-800 hover-input focus:outline-hidden focus:border-accent-yellow focus:ring-1 focus:ring-accent-yellow font-sans"
                   >
                     <option value="Men's Apparel">Men&apos;s Apparel</option>
                     <option value="Women's Apparel">Women&apos;s Apparel</option>
@@ -432,57 +439,64 @@ export const AdminPanel: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Offer Pricing ($)</label>
+                  <label htmlFor="prod-price" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Offer Pricing ($)</label>
                   <input
+                    id="prod-price"
                     type="number"
                     step="0.01"
                     required
+                    aria-required="true"
                     value={newProdPrice}
                     onChange={(e) => setNewProdPrice(e.target.value)}
-                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 font-mono font-semibold"
+                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 hover-input focus:outline-hidden focus:border-accent-yellow focus:ring-1 focus:ring-accent-yellow font-mono font-semibold"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Original Price ($)</label>
+                  <label htmlFor="prod-orig-price" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Original Price ($)</label>
                   <input
+                    id="prod-orig-price"
                     type="number"
                     step="0.01"
                     value={newProdOrigPrice}
                     onChange={(e) => setNewProdOrigPrice(e.target.value)}
-                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 font-mono font-semibold"
+                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 hover-input focus:outline-hidden focus:border-accent-yellow focus:ring-1 focus:ring-accent-yellow font-mono font-semibold"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Initial Stock Count</label>
+                  <label htmlFor="prod-stock" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Initial Stock Count</label>
                   <input
+                    id="prod-stock"
                     type="number"
                     required
+                    aria-required="true"
                     value={newProdStock}
                     onChange={(e) => setNewProdStock(e.target.value)}
-                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 font-mono font-semibold"
+                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 hover-input focus:outline-hidden focus:border-accent-yellow focus:ring-1 focus:ring-accent-yellow font-mono font-semibold"
                   />
                 </div>
 
                 <div className="md:col-span-3">
-                  <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Unsplash/Image Address Link</label>
+                  <label htmlFor="prod-image" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Unsplash/Image Address Link</label>
                   <input
+                    id="prod-image"
                     type="url"
                     value={newProdImage}
                     onChange={(e) => setNewProdImage(e.target.value)}
-                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 font-mono"
+                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 hover-input focus:outline-hidden focus:border-accent-yellow focus:ring-1 focus:ring-accent-yellow font-mono"
                     placeholder="https://images.unsplash.com/photo-..."
                   />
                 </div>
 
                 <div className="md:col-span-3">
-                  <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Product Description</label>
+                  <label htmlFor="prod-desc" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Product Description</label>
                   <textarea
+                    id="prod-desc"
                     rows={2}
                     value={newProdDesc}
                     onChange={(e) => setNewProdDesc(e.target.value)}
-                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 font-sans"
+                    className="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 hover-input focus:outline-hidden focus:border-accent-yellow focus:ring-1 focus:ring-accent-yellow font-sans"
                     placeholder="Enter complete technical specifications, fabric details, sizing info..."
                   ></textarea>
                 </div>
@@ -498,7 +512,7 @@ export const AdminPanel: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-neutral-900 text-white rounded-xl text-xs font-bold hover:bg-neutral-800"
+                  className="px-5 py-2 bg-neutral-900 text-white rounded-xl text-xs font-bold hover:bg-neutral-800 hover-lift"
                 >
                   Create Product Entry
                 </button>
@@ -556,7 +570,7 @@ export const AdminPanel: React.FC = () => {
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
                           <span className={`w-2 h-2 rounded-full ${
-                            item.stock <= 0 ? 'bg-red-500' : item.stock <= 5 ? 'bg-amber-500 animate-pulse' : 'bg-orange-500'
+                            item.stock <= 0 ? 'bg-red-500' : item.stock <= 5 ? 'bg-amber-500 animate-pulse' : 'bg-accent-yellow'
                           }`}></span>
                           <span className="font-mono font-bold text-neutral-850">
                             {item.stock} items
@@ -685,7 +699,7 @@ export const AdminPanel: React.FC = () => {
                               : ord.status === 'shipped'
                               ? 'bg-purple-50 border-purple-100 text-purple-700'
                               : ord.status === 'delivered'
-                              ? 'bg-orange-50 border-orange-100 text-orange-700'
+                              ? 'bg-accent-yellow/10 border-accent-yellow/20 text-accent-yellow'
                               : 'bg-red-50 border-red-100 text-red-600'
                           }`}>
                             {ord.status}
@@ -730,10 +744,12 @@ export const AdminPanel: React.FC = () => {
 
             <form onSubmit={handleAddCouponSubmit} className="flex flex-col gap-4">
               <div>
-                <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Promo Code</label>
+                <label htmlFor="coupon-code" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Promo Code</label>
                 <input
+                  id="coupon-code"
                   type="text"
                   required
+                  aria-required="true"
                   placeholder="e.g. GETWINTER20"
                   value={newCode}
                   onChange={(e) => setNewCode(e.target.value)}
@@ -743,8 +759,9 @@ export const AdminPanel: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Discount Style</label>
+                  <label htmlFor="coupon-discount-type" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Discount Style</label>
                   <select
+                    id="coupon-discount-type"
                     value={newDiscountType}
                     onChange={(e) => setNewDiscountType(e.target.value as any)}
                     className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs focus:outline-hidden"
@@ -755,10 +772,12 @@ export const AdminPanel: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Benefit Value</label>
+                  <label htmlFor="coupon-value" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Benefit Value</label>
                   <input
+                    id="coupon-value"
                     type="number"
                     required
+                    aria-required="true"
                     value={newValue}
                     onChange={(e) => setNewValue(e.target.value)}
                     className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-xs text-neutral-800 focus:outline-hidden font-mono font-bold"
@@ -767,8 +786,9 @@ export const AdminPanel: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Minimum Order Value ($)</label>
+                <label htmlFor="coupon-min-spend" className="block text-[11px] font-bold text-neutral-600 uppercase mb-1">Minimum Order Value ($)</label>
                 <input
+                  id="coupon-min-spend"
                   type="number"
                   value={newMinSpend}
                   onChange={(e) => setNewMinSpend(e.target.value)}
@@ -779,7 +799,7 @@ export const AdminPanel: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-neutral-900 border border-neutral-900 text-white rounded-xl text-xs font-bold uppercase hover:bg-neutral-850 mt-2 cursor-pointer"
+                className="w-full py-3 bg-neutral-900 border border-neutral-900 text-white rounded-xl text-xs font-bold uppercase hover:bg-neutral-800 mt-2 cursor-pointer hover-lift"
               >
                 Create active coupon
               </button>
@@ -800,7 +820,7 @@ export const AdminPanel: React.FC = () => {
                   className="flex items-center justify-between gap-4 p-4 rounded-xl border border-neutral-100 hover:border-neutral-200 transition-colors"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 font-mono font-bold text-xs shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-accent-yellow/10 border border-accent-yellow/20 flex items-center justify-center text-accent-yellow font-mono font-bold text-xs shrink-0">
                       %
                     </div>
                     <div>
@@ -817,7 +837,7 @@ export const AdminPanel: React.FC = () => {
                       onClick={() => handleToggleCoupon(c.code, c.isActive)}
                       className={`text-[9px] font-mono font-bold px-2 py-0.5 border rounded-md cursor-pointer uppercase ${
                         c.isActive
-                          ? 'bg-orange-50 border-orange-100 text-orange-700'
+                          ? 'bg-accent-yellow/10 border-accent-yellow/20 text-accent-yellow'
                           : 'bg-neutral-100 border-neutral-200 text-neutral-400'
                       }`}
                     >

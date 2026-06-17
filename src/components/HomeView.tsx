@@ -24,8 +24,13 @@ interface HomeViewProps {
 export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
   const { products, setView, setSelectedProductId, favorites, isLoaded } = useApp();
   const carouselRef = React.useRef<HTMLDivElement>(null);
+  const touchStartX = React.useRef(0);
+  const touchStartY = React.useRef(0);
   const [activeCard, setActiveCard] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
+  const [isHoveringCarousel, setIsHoveringCarousel] = useState(false);
 
   const heroImages = [
     "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=85",
@@ -48,24 +53,84 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
 
   const featuredProducts = products.filter((p) => p.isFeatured);
 
-  const handleScroll = () => {
+  const getItemWidth = (): number => {
+    if (!carouselRef.current) return 480;
+    const containerWidth = carouselRef.current.clientWidth;
+    if (containerWidth >= 1024) return (containerWidth - 48) / 3;
+    if (containerWidth >= 640) return 264;
+    return containerWidth - 32;
+  };
+
+  const updateScrollState = () => {
     if (!carouselRef.current) return;
-    const scrollLeft = carouselRef.current.scrollLeft;
-    const width = carouselRef.current.offsetWidth;
-    const newIndex = Math.round(scrollLeft / width);
+    const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+    const maxScroll = scrollWidth - clientWidth;
+    const itemWidth = maxScroll <= 0 ? clientWidth : getItemWidth();
+    const newIndex = Math.min(
+      Math.round(scrollLeft / itemWidth),
+      featuredProducts.length - 1
+    );
     setActiveCard(newIndex);
+    setCanScrollLeft(scrollLeft > 10);
+    setCanScrollRight(maxScroll > 10 && scrollLeft < maxScroll - 10);
+  };
+
+  useEffect(() => {
+    updateScrollState();
+    const onResize = () => updateScrollState();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [featuredProducts.length, isLoaded]);
+
+  // Auto-rotation every 5 seconds, pauses on hover
+  useEffect(() => {
+    if (featuredProducts.length <= 1) return;
+    const interval = setInterval(() => {
+      if (isHoveringCarousel || !carouselRef.current) return;
+      const itemWidth = getItemWidth();
+      const currentIndex = Math.round(carouselRef.current.scrollLeft / itemWidth);
+      if (currentIndex >= featuredProducts.length - 1) {
+        carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        carouselRef.current.scrollBy({ left: itemWidth, behavior: 'smooth' });
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [featuredProducts.length, isHoveringCarousel]);
+
+  const handleScroll = () => {
+    requestAnimationFrame(updateScrollState);
   };
 
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (!carouselRef.current) return;
-    const offset = direction === 'left' ? -carouselRef.current.offsetWidth : carouselRef.current.offsetWidth;
-    carouselRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    const distance = getItemWidth();
+    carouselRef.current.scrollBy({
+      left: direction === 'left' ? -distance : distance,
+      behavior: 'smooth',
+    });
   };
 
   const scrollToItem = (index: number) => {
     if (!carouselRef.current) return;
-    const width = carouselRef.current.offsetWidth;
-    carouselRef.current.scrollTo({ left: index * width, behavior: 'smooth' });
+    const itemWidth = getItemWidth();
+    carouselRef.current.scrollTo({
+      left: index * itemWidth,
+      behavior: 'smooth',
+    });
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx > 0) scrollCarousel('left');
+    else scrollCarousel('right');
   };
 
   const handleCategoryClick = (category: string) => {
@@ -198,7 +263,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
             </div>
             <button 
               onClick={() => { setCategoryFilter('all'); setView('catalog'); }}
-              className="text-accent-yellow font-bold hover:underline underline-offset-4 transition-all uppercase tracking-wider text-sm"
+              className="text-accent-yellow font-bold uppercase tracking-wider text-sm hover-underline"
             >
               Show all collections
             </button>
@@ -233,14 +298,14 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
                   show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
                 }}
                 onClick={() => handleCategoryClick(cluster.id)}
-                className={`group relative ${cluster.span} ${cluster.height} rounded-[2rem] overflow-hidden bg-neutral-900 cursor-pointer shadow-sm shadow-black/5 hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 transition-all duration-500`}
+                className={`group relative ${cluster.span} ${cluster.height} rounded-[2rem] overflow-hidden bg-neutral-900 cursor-pointer shadow-sm shadow-black/5 hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 transition-all duration-300 ease-out`}
               >
                 <LazyImage 
                   src={cluster.bg} 
                   alt={cluster.title} 
                   fill 
                   referrerPolicy="no-referrer" 
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 duration-700 transition-all opacity-70 will-change-transform" 
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-108 duration-300 ease-out transition-all opacity-70 will-change-transform" 
                   wrapperClassName="absolute inset-0 w-full h-full"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
@@ -253,7 +318,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
                     <h3 className="text-3xl md:text-4xl font-display font-bold text-white leading-[0.9] mb-6 group-hover:text-accent-yellow transition-colors duration-300 uppercase tracking-tight">
                       {cluster.title}
                     </h3>
-                    <div className="inline-flex items-center gap-3 bg-accent-yellow text-navy px-8 py-3.5 rounded-2xl text-[10px] font-display font-bold uppercase tracking-[0.2em] opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:scale-105 active:scale-95 shadow-xl">
+                    <div className="inline-flex items-center gap-3 bg-accent-yellow text-navy px-8 py-3.5 rounded-2xl text-[10px] font-display font-bold uppercase tracking-[0.2em] opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-[#FFC700] hover:-translate-y-1 hover:shadow-2xl active:bg-[#FFB800] active:scale-95 shadow-xl">
                       Explore Collection <ArrowRight className="w-4 h-4" />
                     </div>
                   </div>
@@ -276,67 +341,74 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
               </div>
               <button 
                 onClick={() => setView('catalog')}
-                className="flex items-center gap-3 text-navy font-display font-bold hover:translate-x-2 transition-all text-sm group uppercase tracking-[0.2em] bg-bg-light px-8 py-4 rounded-2xl border border-neutral-100 shadow-xs"
+                className="flex items-center gap-3 text-navy font-display font-bold text-sm group uppercase tracking-[0.2em] bg-bg-light px-8 py-4 rounded-2xl border border-neutral-100 shadow-xs hover-lift"
               >
                 Full Catalog
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1 text-accent-yellow" />
               </button>
             </div>
 
-            <div className="relative group/carousel">
+            <div className="relative">
               {/* Navigation Arrows (Desktop) */}
-              <button 
+              <button
                 onClick={() => scrollCarousel('left')}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 z-20 bg-navy text-accent-yellow shadow-2xl rounded-2xl p-5 opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 transition-all duration-300 hidden lg:flex hover:scale-110 active:scale-90 cursor-pointer border border-white/10"
+                disabled={!canScrollLeft}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 z-20 w-12 h-12 bg-accent-yellow text-navy shadow-lg rounded-full flex items-center justify-center transition-all duration-200 ease-out hover:bg-[#FFC700] hover:scale-110 hover:shadow-xl active:bg-[#FFB800] active:scale-95 disabled:opacity-0 disabled:pointer-events-none hidden lg:flex"
                 aria-label="Scroll left"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
-              
-              <button 
+
+              <button
                 onClick={() => scrollCarousel('right')}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 z-20 bg-navy text-accent-yellow shadow-2xl rounded-2xl p-5 opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 transition-all duration-300 hidden lg:flex hover:scale-110 active:scale-90 cursor-pointer border border-white/10"
+                disabled={!canScrollRight}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 z-20 w-12 h-12 bg-accent-yellow text-navy shadow-lg rounded-full flex items-center justify-center transition-all duration-200 ease-out hover:bg-[#FFC700] hover:scale-110 hover:shadow-xl active:bg-[#FFB800] active:scale-95 disabled:opacity-0 disabled:pointer-events-none hidden lg:flex"
                 aria-label="Scroll right"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5" />
               </button>
 
               {/* Mobile Swipe Hint */}
               <AnimatePresence>
                 {showSwipeHint && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     className="lg:hidden absolute top-0 left-1/2 -translate-x-1/2 z-10 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-4 py-1.5 rounded-full flex items-center gap-2 pointer-events-none uppercase tracking-widest"
                   >
-                    <ChevronLeft className="w-3 h-3 animate-pulse" /> 
-                    Swipe to explore 
+                    <ChevronLeft className="w-3 h-3 animate-pulse" />
+                    Swipe to explore
                     <ChevronRight className="w-3 h-3 animate-pulse" />
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <div 
+              <div
                 ref={carouselRef}
                 onScroll={handleScroll}
-                className="flex gap-6 overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory pb-10 pt-4 px-2"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                onMouseEnter={() => setIsHoveringCarousel(true)}
+                onMouseLeave={() => setIsHoveringCarousel(false)}
+                className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-10 pt-4 px-2"
+                style={{ scrollBehavior: 'smooth', willChange: 'scroll-position' }}
               >
                 {!isLoaded ? (
                   Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="min-w-[85vw] sm:min-w-[320px] lg:min-w-[calc(25%-18px)] snap-start">
+                    <div key={i} className="min-w-[85vw] sm:min-w-[320px] lg:min-w-[calc(25%-18px)] snap-start shrink-0">
                       <ProductCardSkeleton />
                     </div>
                   ))
                 ) : (
                   featuredProducts.map((prod, i) => (
-                    <motion.div 
-                      key={prod.id} 
+                    <motion.div
+                      key={prod.id}
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1, duration: 0.5 }}
-                      className="min-w-[85vw] sm:min-w-[320px] lg:min-w-[calc(25%-18px)] snap-start"
+                      className="w-[calc(100vw-2rem)] sm:w-[240px] lg:w-[calc(33.333%-16px)] snap-start shrink-0"
                     >
                       <ProductCard product={prod} />
                     </motion.div>
@@ -345,24 +417,20 @@ export const HomeView: React.FC<HomeViewProps> = ({ setCategoryFilter }) => {
               </div>
 
               {/* Status & Dots */}
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  {featuredProducts.map((_, i) => {
-                    // Logic to show only relevant dots if too many items
-                    const isNearby = Math.abs(activeCard - i) <= 2;
-                    if (!isNearby && featuredProducts.length > 10) return null;
-                    
-                    return (
-                      <button
-                        key={i}
-                        onClick={() => scrollToItem(i)}
-                        className={`h-2.5 rounded-full transition-all duration-500 cursor-pointer ${
-                          activeCard === i ? 'w-10 bg-orange-600 shadow-md shadow-orange-200' : 'w-2.5 bg-slate-200 hover:bg-slate-300'
-                        }`}
-                        aria-label={`Go to slide ${i + 1}`}
-                      />
-                    );
-                  })}
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center gap-2">
+                  {featuredProducts.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => scrollToItem(i)}
+                      className={`rounded-full transition-all duration-200 ease-out cursor-pointer ${
+                        activeCard === i
+                          ? 'w-3 h-3 bg-accent-yellow shadow-md shadow-accent-yellow/30 scale-[1.3]'
+                          : 'w-2.5 h-2.5 bg-slate-300 hover:bg-slate-400 hover:scale-[1.2]'
+                      }`}
+                      aria-label={`Go to slide ${i + 1}`}
+                    />
+                  ))}
                 </div>
                 <div className="text-[10px] font-mono font-bold text-neutral-400 tracking-tighter uppercase">
                   Showing {activeCard + 1} of {featuredProducts.length} Trending Styles

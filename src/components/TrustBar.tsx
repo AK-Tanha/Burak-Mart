@@ -8,33 +8,21 @@ export const TrustBar: React.FC = () => {
       icon: ShieldCheck, 
       title: '100% AUTHENTIC', 
       description: 'Sourced directly from verified premium agencies. Every product guaranteed authentic.',
-      bgColor: 'bg-accent-yellow/10',
-      iconColor: 'text-accent-yellow',
-      borderColor: 'hover:border-accent-yellow'
     },
     { 
       icon: Zap, 
       title: 'FAST DELIVERY', 
       description: 'Quick processing and swift shipment. Track your order in real time.',
-      bgColor: 'bg-accent-yellow/10',
-      iconColor: 'text-accent-yellow',
-      borderColor: 'hover:border-accent-yellow'
     },
     { 
       icon: HandCoins, 
       title: 'CASH ON DELIVERY', 
       description: 'Pay when your order arrives. Inspect packages before paying with complete confidence.',
-      bgColor: 'bg-accent-yellow/10',
-      iconColor: 'text-accent-yellow',
-      borderColor: 'hover:border-accent-yellow'
     },
     { 
       icon: Headset, 
       title: 'SUPPORT SERVICES', 
       description: "Dedicated customer support via email and phone. We're here to help.",
-      bgColor: 'bg-accent-yellow/10',
-      iconColor: 'text-accent-yellow',
-      borderColor: 'hover:border-accent-yellow'
     },
   ];
 
@@ -68,10 +56,10 @@ export const TrustBar: React.FC = () => {
                 scale: 1.05,
                 transition: { duration: 0.2 }
               }}
-              className={`group bg-white p-8 rounded-2xl border-2 border-slate-100 shadow-sm transition-all duration-300 flex flex-col items-center text-center cursor-default ${item.borderColor} hover:shadow-xl`}
+              className="group bg-white p-8 rounded-2xl border-2 border-slate-100 shadow-sm transition-all duration-300 flex flex-col items-center text-center cursor-default hover:border-accent-yellow hover:shadow-xl"
             >
-              <div className={`p-4 ${item.bgColor} ${item.iconColor} rounded-2xl mb-6 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110`}>
-                <item.icon className="w-12 h-12" strokeWidth={2.5} />
+              <div className="w-16 h-16 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-accent-yellow/10 text-accent-yellow rounded-full flex items-center justify-center mb-6 transition-all duration-200 ease-out group-hover:bg-accent-yellow group-hover:text-navy group-hover:scale-110">
+                <item.icon className="w-8 h-8 md:w-7 md:h-7 lg:w-8 lg:h-8" strokeWidth={2.5} />
               </div>
               <h3 className="text-xl font-display text-navy mb-3 uppercase tracking-wide">
                 {item.title}

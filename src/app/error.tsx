@@ -25,7 +25,7 @@ export default function ErrorPage({
         </p>
         <button
           onClick={() => reset()}
-          className="mt-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold py-3 px-6 rounded-xl transition-all cursor-pointer shadow-sm mx-auto"
+          className="mt-2 bg-accent-yellow text-navy hover:bg-[#FFC700] text-sm font-bold py-3 px-6 rounded-xl transition-all cursor-pointer shadow-sm mx-auto"
         >
           Reload Experience
         </button>

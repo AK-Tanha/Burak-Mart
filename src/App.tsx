@@ -45,7 +45,7 @@ function AppContent() {
 
   return (
     <LayoutWrapper>
-      <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-orange-100 text-slate-800 font-sans" id="store-root-app">
+      <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-accent-yellow/30 text-slate-800 font-sans" id="store-root-app">
         {/* Visual Navigation Bar */}
         <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 

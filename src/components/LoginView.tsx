@@ -21,7 +21,7 @@ export const LoginView: React.FC = () => {
           <option value="customer">Customer</option>
           <option value="admin">Admin</option>
         </select>
-        <button onClick={handleLogin} className="w-full bg-orange-600 text-white p-2 rounded">Enter</button>
+        <button onClick={handleLogin} className="w-full bg-accent-yellow text-navy p-2 rounded font-bold">Enter</button>
       </div>
     </div>
   );

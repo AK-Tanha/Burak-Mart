@@ -73,22 +73,22 @@ export const Footer: React.FC = () => {
           </h4>
           <ul className="text-xs text-neutral-400 space-y-2.5">
             <li>
-              <button onClick={() => setView('catalog')} className="hover:text-orange-500 cursor-pointer">
+              <button onClick={() => setView('catalog')} className="hover:text-accent-yellow cursor-pointer">
                 Men&apos;s Apparel Wear
               </button>
             </li>
             <li>
-              <button onClick={() => setView('catalog')} className="hover:text-orange-500 cursor-pointer">
+              <button onClick={() => setView('catalog')} className="hover:text-accent-yellow cursor-pointer">
                 Women&apos;s Apparel Wear
               </button>
             </li>
             <li>
-              <button onClick={() => setView('catalog')} className="hover:text-orange-500 cursor-pointer">
+              <button onClick={() => setView('catalog')} className="hover:text-accent-yellow cursor-pointer">
                 Smart Tech Accessories
               </button>
             </li>
             <li>
-              <button onClick={() => setView('catalog')} className="hover:text-orange-500 cursor-pointer">
+              <button onClick={() => setView('catalog')} className="hover:text-accent-yellow cursor-pointer">
                 Footwear & Shoes
               </button>
             </li>
@@ -103,7 +103,7 @@ export const Footer: React.FC = () => {
           <ul className="text-xs text-neutral-400 space-y-3 font-sans">
             <li>
               <strong>Support Email:</strong>{' '}
-              <a href="mailto:support@burakmart.com" className="text-neutral-300 hover:text-orange-500 font-mono">
+              <a href="mailto:support@burakmart.com" className="text-neutral-300 hover:text-accent-yellow font-mono">
                 support@burakmart.com
               </a>
             </li>

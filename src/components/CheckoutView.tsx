@@ -5,11 +5,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 import { CheckCircle, Truck, PhoneCall, AlertCircle, ShoppingBag, ArrowLeft, Landmark } from 'lucide-react';
 import { ShippingDetails } from '../types';
 import { Button } from './Button';
+import { FormField } from './FormField';
+import { validators } from '../lib/validation';
 
 export const CheckoutView: React.FC = () => {
   const { cart, activeCoupon, placeOrder, setView } = useApp();
@@ -24,6 +26,8 @@ export const CheckoutView: React.FC = () => {
     notes: ''
   });
 
+  const [errors, setErrors] = useState<Partial<Record<keyof ShippingDetails, string>>>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof ShippingDetails, boolean>>>({});
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   const [errorMsg, setErrorMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -43,28 +47,56 @@ export const CheckoutView: React.FC = () => {
   const shippingCost = shippingMethod === 'express' ? 9.99 : subtotal >= 50.00 ? 0.00 : 5.99;
   const total = Math.max(0, subtotal - discountAmount + shippingCost);
 
+  const validateField = useCallback((name: keyof ShippingDetails, value: string) => {
+    const rules: Record<keyof ShippingDetails, (v: string) => string> = {
+      fullName: validators.name,
+      email: validators.email,
+      phone: validators.phone,
+      address: (v) => validators.text(v, 5, 200),
+      city: validators.name,
+      postalCode: validators.postalCode,
+      notes: () => '',
+    };
+    return rules[name](value);
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const key = name as keyof ShippingDetails;
+    setFormData((prev) => ({ ...prev, [key]: value }));
+    if (touched[key]) {
+      setErrors((prev) => ({ ...prev, [key]: validateField(key, value) }));
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    const key = name as keyof ShippingDetails;
+    setTouched((prev) => ({ ...prev, [key]: true }));
+    setErrors((prev) => ({ ...prev, [key]: validateField(key, value) }));
+  };
+
+  const isFormValid = (): boolean => {
+    const fields: (keyof ShippingDetails)[] = ['fullName', 'email', 'phone', 'address', 'city', 'postalCode'];
+    const newErrors: Partial<Record<keyof ShippingDetails, string>> = {};
+    let valid = true;
+    for (const field of fields) {
+      const err = validateField(field, formData[field] ?? '');
+      if (err) { newErrors[field] = err; valid = false; }
+    }
+    setErrors(newErrors);
+    setTouched(Object.fromEntries(fields.map((f) => [f, true])) as any);
+    return valid;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-
-    // Field safety validations
-    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.address.trim() || !formData.city.trim() || !formData.postalCode.trim()) {
-      setErrorMsg('Please fully complete all required delivery details.');
-      return;
-    }
-
+    if (!isFormValid()) return;
     setSubmitting(true);
-
-    // Simulate standard fast database record creations
     setTimeout(() => {
       const order = placeOrder(formData, shippingMethod);
       setSubmitting(false);
-      
       if (!order) {
         setErrorMsg('Fatal checkout error. Unable to process empty carts.');
       }
@@ -96,7 +128,7 @@ export const CheckoutView: React.FC = () => {
         variant="tertiary"
         size="md"
         onClick={() => setView('cart')}
-        className="mb-6 bg-transparent hover:bg-neutral-50 !p-0 !h-auto text-neutral-500 hover:text-orange-600 border-none"
+        className="mb-6 bg-transparent hover:bg-neutral-50 !p-0 !h-auto text-neutral-500 hover:text-accent-yellow border-none"
         icon={<ArrowLeft className="w-4 h-4" />}
       >
         Return to your shopping bag
@@ -116,117 +148,101 @@ export const CheckoutView: React.FC = () => {
               </p>
             </div>
 
-            {errorMsg && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-xl flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
+            <div className="min-h-[48px]">
+              {errorMsg && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-xl flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{errorMsg}</span>
+                </div>
+              )}
+            </div>
 
             {/* Inputs Core */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                  Full Customer Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
+                <FormField
+                  label="Full Customer Name"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  required
+                  onBlur={handleBlur}
+                  error={touched.fullName ? errors.fullName : undefined}
                   placeholder="e.g. Burak Erdogan"
-                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
+                  required
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="e.g. email@example.com"
-                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
-                />
-              </div>
+              <FormField
+                label="Email Address"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                error={touched.email ? errors.email : undefined}
+                placeholder="e.g. email@example.com"
+                required
+              />
 
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                  Mobile Phone Number <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="e.g. +90 555 123 4567"
-                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-mono font-semibold"
-                />
-              </div>
+              <FormField
+                label="Mobile Phone Number"
+                name="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                error={touched.phone ? errors.phone : undefined}
+                placeholder="e.g. +90 555 123 4567"
+                required
+              />
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                  Delivery Home Address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
+                <FormField
+                  label="Delivery Home Address"
                   name="address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  required
+                  onBlur={handleBlur}
+                  error={touched.address ? errors.address : undefined}
                   placeholder="Street name, apartment, building number..."
-                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
+                  required
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                  City <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="e.g. Istanbul"
-                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
-                />
-              </div>
+              <FormField
+                label="City"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                error={touched.city ? errors.city : undefined}
+                placeholder="e.g. Istanbul"
+                required
+              />
 
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                  Postal/Zip Code <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="postalCode"
-                  value={formData.postalCode}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="e.g. 34367"
-                  className="w-full pl-3.5 pr-2 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-mono font-semibold"
-                />
-              </div>
+              <FormField
+                label="Postal/Zip Code"
+                name="postalCode"
+                value={formData.postalCode}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                error={touched.postalCode ? errors.postalCode : undefined}
+                placeholder="e.g. 34367"
+                required
+              />
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                  Custom Delivery Instruction Notes (Optional)
-                </label>
-                <textarea
+                <FormField
+                  label="Delivery Instruction Notes (Optional)"
                   name="notes"
                   value={formData.notes}
                   onChange={handleInputChange}
-                  rows={2}
+                  onBlur={handleBlur}
+                  error={touched.notes ? errors.notes : undefined}
                   placeholder="Leave with neighbor, buzzer code, call at arrival..."
-                  className="w-full pl-3.5 pr-2 py-2 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:bg-white text-xs text-neutral-800 transition-all font-sans"
-                ></textarea>
+                  textarea
+                  rows={2}
+                />
               </div>
             </div>
 
@@ -244,11 +260,11 @@ export const CheckoutView: React.FC = () => {
                   onClick={() => setShippingMethod('standard')}
                   className={`p-4 border rounded-2xl text-left flex gap-3 transition-colors cursor-pointer ${
                     shippingMethod === 'standard'
-                      ? 'bg-orange-50/70 border-orange-600 text-orange-805'
+                      ? 'bg-accent-yellow/10 border-accent-yellow text-accent-yellow'
                       : 'bg-white border-neutral-250 text-neutral-600 hover:border-neutral-350'
                   }`}
                 >
-                  <Truck className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
+                  <Truck className="w-5 h-5 text-accent-yellow shrink-0 mt-0.5" />
                   <div>
                     <span className="block text-xs font-bold uppercase tracking-tight">Standard Fast Delivery</span>
                     <span className="block text-[10px] text-neutral-400 mt-1">Delivered in 3 to 5 business days</span>
@@ -264,7 +280,7 @@ export const CheckoutView: React.FC = () => {
                   onClick={() => setShippingMethod('express')}
                   className={`p-4 border rounded-2xl text-left flex gap-3 transition-colors cursor-pointer ${
                     shippingMethod === 'express'
-                      ? 'bg-orange-50/70 border-orange-600 text-orange-805'
+                      ? 'bg-accent-yellow/10 border-accent-yellow text-accent-yellow'
                       : 'bg-white border-neutral-250 text-neutral-600 hover:border-neutral-350'
                   }`}
                 >
@@ -285,8 +301,8 @@ export const CheckoutView: React.FC = () => {
               <h3 className="font-sans font-bold text-neutral-800 text-sm mb-3">
                 Trusted Payment Choice
               </h3>
-              <div className="bg-orange-50/60 rounded-2xl p-4 border border-orange-100 flex gap-4 text-orange-900" id="payment-method-card">
-                <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center text-white shrink-0 mt-0.5 shadow-xs">
+              <div className="bg-accent-yellow/5 rounded-2xl p-4 border border-accent-yellow/20 flex gap-4 text-navy" id="payment-method-card">
+                <div className="w-10 h-10 rounded-xl bg-accent-yellow flex items-center justify-center text-navy shrink-0 mt-0.5 shadow-xs">
                   <Landmark className="w-5 h-5" />
                 </div>
                 <div>
@@ -339,7 +355,7 @@ export const CheckoutView: React.FC = () => {
               </div>
 
               {activeCoupon && (
-                <div className="flex justify-between text-orange-700 font-semibold bg-orange-50 border border-orange-100 rounded-lg p-2">
+                <div className="flex justify-between text-accent-yellow font-semibold bg-accent-yellow/5 border border-accent-yellow/20 rounded-lg p-2">
                   <span>Promo Coupon Discount</span>
                   <span>-${discountAmount.toFixed(2)}</span>
                 </div>
@@ -348,7 +364,7 @@ export const CheckoutView: React.FC = () => {
               <div className="flex justify-between">
                 <span className="flex items-center gap-1">
                   <span>Shipping & Delivery Cost</span>
-                  {shippingMethod === 'express' && <span className="text-[10px] bg-amber-50 text-amber-700 px-1 border rounded-sm">Express</span>}
+                  {shippingMethod === 'express' &&                   <span className="text-[10px] bg-accent-yellow/10 text-accent-yellow px-1 border border-accent-yellow/20 rounded-sm">Express</span>}
                 </span>
                 <span className="font-mono font-semibold text-neutral-800">
                   {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
@@ -363,7 +379,7 @@ export const CheckoutView: React.FC = () => {
                   <span className="text-xl md:text-2xl font-sans font-extrabold text-neutral-950">
                     ${total.toFixed(2)}
                   </span>
-                  <span className="block text-[9px] font-mono text-orange-600 font-bold uppercase mt-0.5">
+                  <span className="block text-[9px] font-mono text-accent-yellow font-bold uppercase mt-0.5">
                     Pay Cash On Delivery
                   </span>
                 </div>
@@ -386,7 +402,7 @@ export const CheckoutView: React.FC = () => {
 
             {/* Quick Guarantees Badge */}
             <div className="mt-5 pt-4.5 border-t border-neutral-100 flex items-center justify-center gap-2 text-neutral-500 text-[10px] font-mono uppercase font-semibold">
-              <PhoneCall className="w-4 h-4 text-orange-600 animate-bounce" />
+              <PhoneCall className="w-4 h-4 text-accent-yellow animate-bounce" />
               <span>Free COD doorstep inspection</span>
             </div>
 

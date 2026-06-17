@@ -40,7 +40,7 @@ export const BottomNav: React.FC = () => {
                         >
                             <div className="relative group p-1">
                                 <nav.icon 
-                                    className={`w-6 h-6 transition-all duration-300 ${isActive ? 'text-accent-yellow scale-110' : 'text-slate-400 group-hover:text-slate-600'}`} 
+                                    className={`w-6 h-6 transition-all duration-300 ${isActive ? 'text-accent-yellow scale-110' : 'text-slate-400 group-hover:text-accent-yellow group-hover:scale-110'}`} 
                                     strokeWidth={isActive ? 2.5 : 2}
                                 />
                                 

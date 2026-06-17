@@ -11,7 +11,7 @@ export const CustomerDashboard: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         <header className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold">My Dashboard</h1>
-            <button onClick={() => setPortal('store')} className="text-sm font-bold text-orange-600">Back to Store</button>
+            <button onClick={() => setPortal('store')} className="text-sm font-bold text-accent-yellow">Back to Store</button>
         </header>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

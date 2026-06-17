@@ -93,9 +93,9 @@ export const CartView: React.FC = () => {
         <div className="lg:col-span-8 flex flex-col gap-4">
           
           {/* Free Shipping Alert Bar */}
-          <div className="bg-orange-50 border border-orange-100/70 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-orange-850">
+          <div className="bg-accent-yellow/5 border border-accent-yellow/20 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-navy">
             <div className="flex items-center gap-2.5">
-              <Truck className="w-5 h-5 text-orange-600 shrink-0" />
+              <Truck className="w-5 h-5 text-accent-yellow shrink-0" />
               <span className="text-xs font-semibold leading-snug">
                 {isFreeStandardShipping ? (
                   <span>Congratulations! Your order qualifies for <strong>Free Standard Delivery</strong>! ✨</span>
@@ -108,7 +108,7 @@ export const CartView: React.FC = () => {
             {!isFreeStandardShipping && (
               <div className="h-1.5 bg-neutral-200/50 rounded-full w-full sm:w-36 overflow-hidden">
                 <div 
-                  className="h-full bg-orange-600 rounded-full"
+                  className="h-full bg-accent-yellow rounded-full"
                   style={{ width: `${(subtotal / freeShippingThreshold) * 100}%` }}
                 ></div>
               </div>
@@ -139,7 +139,7 @@ export const CartView: React.FC = () => {
                   <div>
                     <div className="flex justify-between items-start gap-3">
                       <h3 
-                        className="font-sans font-bold text-neutral-800 text-sm md:text-base hover:text-orange-600 transition-colors cursor-pointer line-clamp-1"
+                        className="font-sans font-bold text-neutral-800 text-sm md:text-base hover:text-accent-yellow transition-colors cursor-pointer line-clamp-1"
                         onClick={() => handleProductNavigate(item.product.id)}
                       >
                         {item.product.name}
@@ -214,10 +214,11 @@ export const CartView: React.FC = () => {
             <form onSubmit={handleApplyPromo} className="flex gap-2">
               <input
                 type="text"
+                aria-label="Promo code"
                 placeholder="e.g. BURAK10"
                 value={promoCodeInput}
                 onChange={(e) => setPromoCodeInput(e.target.value)}
-                className="flex-1 pl-3.5 pr-2 py-2 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-hidden focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-xs font-mono font-semibold uppercase h-12"
+                className="flex-1 pl-3.5 pr-2 py-2 bg-neutral-50 border border-neutral-200 rounded-xl hover-input focus:outline-hidden focus:border-accent-yellow focus:ring-1 focus:ring-accent-yellow text-xs font-mono font-semibold uppercase h-12"
               />
               <Button
                 type="submit"
@@ -230,7 +231,7 @@ export const CartView: React.FC = () => {
             </form>
 
             {promoFeedback && (
-              <p className={`text-[11px] font-medium mt-2 ${promoFeedback.success ? 'text-orange-600' : 'text-red-500'}`}>
+              <p role="alert" className={`text-[11px] font-medium mt-2 ${promoFeedback.success ? 'text-accent-yellow' : 'text-red-500'}`}>
                 {promoFeedback.message}
               </p>
             )}
@@ -238,7 +239,7 @@ export const CartView: React.FC = () => {
             {/* Hint Box with preseed coupons */}
             <div className="bg-neutral-50 rounded-xl p-3 border border-neutral-150/50 mt-4">
               <span className="block text-[10px] font-mono font-bold text-neutral-400 uppercase mb-1 flex items-center gap-1">
-                <Tag className="w-3 h-3 text-orange-505 text-orange-500" /> Active Coupons For You:
+                <Tag className="w-3 h-3 text-accent-yellow" /> Active Coupons For You:
               </span>
               <ul className="text-[10px] text-neutral-500 font-sans space-y-1">
                 <li>• <strong className="font-mono text-neutral-800">BURAK10</strong>: 10% off entire order!</li>
@@ -261,7 +262,7 @@ export const CartView: React.FC = () => {
               </div>
 
               {activeCoupon && (
-                <div className="flex justify-between text-orange-700 font-semibold bg-orange-50 rounded-lg p-2 border border-orange-100/50">
+                <div className="flex justify-between text-accent-yellow font-semibold bg-accent-yellow/5 rounded-lg p-2 border border-accent-yellow/20">
                   <span className="flex items-center gap-1">
                     <Tag className="w-3 h-3" /> Coupon: {activeCoupon.code}
                   </span>
@@ -271,7 +272,7 @@ export const CartView: React.FC = () => {
 
               <div className="flex justify-between">
                 <span>Standard Delivery Standard</span>
-                <span className="text-orange-655 text-orange-600 font-semibold font-mono">
+                <span className="text-accent-yellow font-semibold font-mono">
                   {isFreeStandardShipping ? 'FREE' : '$5.99'}
                 </span>
               </div>
@@ -305,7 +306,7 @@ export const CartView: React.FC = () => {
             {/* Quick Guarantees Badge Group */}
             <div className="mt-5 space-y-2 pt-4 border-t border-neutral-100 text-[10px] text-neutral-500 font-mono font-semibold uppercase tracking-wider text-center" id="summary-guarantees">
               <div className="flex items-center justify-center gap-1.5">
-                <PackageCheck className="w-4 h-4 text-orange-600" />
+                <PackageCheck className="w-4 h-4 text-accent-yellow" />
                 <span>100% Secure Checkout</span>
               </div>
             </div>

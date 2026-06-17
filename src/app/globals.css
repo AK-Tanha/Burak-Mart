@@ -8,6 +8,8 @@
   /* Primary Palette per 2026 Guide */
   --color-navy: #1a1a2e;
   --color-accent-yellow: #FFD60A;
+  --color-accent-yellow-hover: #FFC700;
+  --color-accent-yellow-active: #FFB800;
   --color-accent-purple: #6a4c93;
   
   /* Background Colors */
@@ -66,4 +68,77 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* ===================================================
+   Hover Animation Utilities
+   =================================================== */
+
+@utility hover-lift {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  &:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@utility hover-glow {
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+  &:hover {
+    box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.15);
+    border-color: #FFD60A;
+  }
+}
+
+@utility hover-input {
+  transition: all 200ms ease;
+  &:hover {
+    border-color: #FFD60A;
+    box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.1);
+  }
+}
+
+@utility hover-underline {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #FFD60A;
+    transition: width 150ms ease;
+  }
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 300ms ease-out forwards;
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
 }

@@ -103,9 +103,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             <Filter className="w-3.5 h-3.5 text-accent-yellow" /> SORT BY:
           </span>
           <select
+            aria-label="Sort products"
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value as any)}
-            className="flex-1 md:flex-initial bg-bg-light border border-neutral-100 rounded-xl px-5 py-2.5 text-xs font-display font-bold text-navy cursor-pointer focus:outline-hidden focus:border-accent-yellow uppercase tracking-wider shadow-inner"
+            className="flex-1 md:flex-initial bg-bg-light border border-neutral-100 rounded-xl px-5 py-2.5 text-xs font-display font-bold text-navy cursor-pointer hover-input focus:outline-hidden focus:border-accent-yellow uppercase tracking-wider shadow-inner"
           >
             <option value="default">Default Features</option>
             <option value="price-asc">Price: Low to High</option>
